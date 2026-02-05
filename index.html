@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FF Wealth | Premium User Panel</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root { --primary: #C2185B; --secondary: #880E4F; --bg: #F4F6F8; --white: #ffffff; --green: #2E7D32; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; touch-action: manipulation; }
+        
+        body { background-color: var(--bg); margin: 0; padding: 0; overflow-x: hidden; width: 100%; height: 100%; }
+
+        /* --- Animated Premium Banner --- */
+        .header { background: var(--primary); color: white; padding: 20px 20px 60px; border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; position: relative; }
+        
+        .hero-banner {
+            margin: 15px 0;
+            height: 130px;
+            background: linear-gradient(-45deg, #C2185B, #ec407a, #880e4f, #ad1457);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+            border-radius: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            box-shadow: 0 8px 20px rgba(194, 24, 91, 0.3);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .hero-banner h1 { margin: 0; font-size: 26px; font-weight: 900; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .hero-banner p { margin: 5px 0 0; font-size: 13px; opacity: 0.9; font-weight: 500; }
+
+        /* --- Admin Message Alert --- */
+        #msg-alert { display: none; background: #fff9c4; color: #827717; padding: 12px; margin: 10px 20px; border-radius: 12px; font-size: 13px; border-left: 5px solid #fbc02d; animation: slideIn 0.5s; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        .balance-card { background: white; margin: -40px 20px 20px; padding: 25px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); text-align: center; position: relative; z-index: 10; border: 1px solid #eee; }
+        .balance-card h2 { color: var(--primary); font-size: 32px; margin: 8px 0; font-weight: 900; }
+
+        .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 10px 20px; }
+        .menu-item { background: white; padding: 18px 10px; text-align: center; border-radius: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04); cursor: pointer; transition: 0.2s; border: 1px solid #f0f0f0; }
+        .menu-item:active { transform: scale(0.9); background: #fdf2f6; }
+        .menu-item i { font-size: 26px; color: var(--primary); margin-bottom: 10px; }
+        .menu-item p { font-size: 12px; font-weight: bold; margin: 0; color: #444; }
+
+        /* Modal Styles */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; overflow-y: auto; }
+        .modal-content { background: white; width: 100%; min-height: 45vh; position: absolute; bottom: 0; border-top-left-radius: 35px; border-top-right-radius: 35px; padding: 30px; animation: slideUp 0.4s cubic-bezier(0, 1, 0.5, 1); }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .btn-main { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 10px rgba(194, 24, 91, 0.2); }
+        .btn-main:active { transform: scale(0.98); }
+
+        .method { border: 2px solid #f0f0f0; padding: 15px; border-radius: 18px; cursor: pointer; text-align: center; transition: 0.3s; }
+        .method.selected { border-color: var(--primary); background: #fdf2f6; }
+        
+        input, select { width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #eee; border-radius: 12px; outline: none; background: #f9f9f9; }
+        input:focus { border-color: var(--primary); background: #fff; }
+
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 900; }
+        .nav-link { text-align: center; color: #888; text-decoration: none; font-size: 11px; font-weight: 600; }
+        .active-nav { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div id="auth-section" style="padding: 50px 25px; text-align: center;">
+        <h2 id="auth-title" style="color: var(--primary); font-size: 28px;">FF WEALTH</h2>
+        <div id="reg-fields" style="display: none;">
+            <input type="text" id="reg-name" placeholder="আপনার পুরো নাম">
+        </div>
+        <input type="number" id="auth-phone" placeholder="মোবাইল নম্বর">
+        <input type="password" id="auth-pin" maxlength="4" placeholder="৪ সংখ্যার পিন">
+        <button class="btn-main" onclick="handleAuth()">প্রবেশ করুন</button>
+        <p id="toggle-text" onclick="toggleAuth()" style="margin-top: 20px; color: #666;">নতুন অ্যাকাউন্ট? <b>রেজিস্ট্রেশন</b></p>
+    </div>
+
+    <div id="app-main" style="display: none; padding-bottom: 80px;">
+        <div class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div><p style="margin:0; opacity:0.8; font-size: 13px;">স্বাগতম,</p><h3 id="user-display-name" style="margin:0;">...</h3></div>
+                <i class="fas fa-sign-out-alt" onclick="logout()" style="font-size: 20px; background: rgba(255,255,255,0.2); padding: 10px; border-radius: 12px;"></i>
+            </div>
+            <div class="hero-banner">
+                <h1>FF WEALTH</h1>
+                <p>নিরাপদ ও দ্রুত আর্থিক সমাধান</p>
+            </div>
+        </div>
+
+        <div id="msg-alert" onclick="this.style.display='none'">
+            <i class="fas fa-envelope-open-text"></i> <span id="admin-msg"></span>
+        </div>
+
+        <div class="balance-card">
+            <p style="margin:0; font-size:14px; color:#777; font-weight: 600;">মোট ব্যালেন্স</p>
+            <h2 id="user-display-balance">৳ 0.00</h2>
+        </div>
+
+        <div class="menu-grid">
+            <div class="menu-item" onclick="openService('loan')"><i class="fas fa-hand-holding-usd"></i><p>লোন আবেদন</p></div>
+            <div class="menu-item" onclick="openService('dps')"><i class="fas fa-piggy-bank"></i><p>ডিপিএস</p></div>
+            <div class="menu-item" onclick="openDepositSelector()"><i class="fas fa-wallet"></i><p>ডিপোজিট</p></div>
+            <div class="menu-item" onclick="openWithdraw()"><i class="fas fa-hand-holding-heart"></i><p>উইথড্র</p></div>
+            <div class="menu-item" onclick="showHistory()"><i class="fas fa-history"></i><p>লেনদেন</p></div>
+            <div class="menu-item" onclick="showSupport()"><i class="fas fa-headset"></i><p>সাপোর্ট</p></div>
+        </div>
+    </div>
+
+    <div id="deposit-selector-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="text-align: center; color: var(--primary);">জমা করার ধরন</h3>
+            <button class="btn-main" onclick="openService('deposit')">সাধারণ ডিপোজিট</button>
+            <button class="btn-main" style="background:#ff9800; margin-top:10px;" onclick="openService('installment')">লোন কিস্তি পরিশোধ</button>
+            <button onclick="closeModal()" style="width:100%; background:none; border:none; margin-top:15px; color:#777;">বন্ধ করুন</button>
+        </div>
+    </div>
+
+    <div id="service-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title" style="text-align: center; color: var(--primary);">সার্ভিস</h3>
+            <div id="step-1" class="step">
+                <label id="srv-label" style="font-weight: bold; font-size: 14px; color: #555;"></label>
+                <div id="amount-container"></div>
+                
+                <select id="loan-reason" style="display:none;">
+                    <option value="">লোনের কারণ</option>
+                    <option value="Personal">ব্যক্তিগত</option>
+                    <option value="Business">ব্যবসা</option>
+                    <option value="Medical">চিকিৎসা</option>
+                </select>
+
+                <select id="srv-duration" onchange="updateCalculation()">
+                    <option value="6">৬ মাস</option>
+                    <option value="12">১২ মাস</option>
+                    <option value="24">২৪ মাস</option>
+                </select>
+                <div id="calc-result" style="background: #e8f5e9; padding: 15px; border-radius: 12px; margin: 10px 0; color: #2e7d32; font-weight: bold; font-size: 14px; text-align: center; display: none;"></div>
+                <button class="btn-main" onclick="goToStep(2)">পরবর্তী ধাপে যান</button>
+            </div>
+
+            <div id="step-2" class="step" style="display:none;">
+                <p style="text-align: center; font-weight: bold;">পেমেন্ট মেথড বেছে নিন</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                    <div class="method" id="m-bKash" onclick="selectMethod('bKash')">bKash</div>
+                    <div class="method" id="m-Nagad" onclick="selectMethod('Nagad')">Nagad</div>
+                    <div class="method" id="m-Rocket" onclick="selectMethod('Rocket')">Rocket</div>
+                    <div class="method" id="m-Upay" onclick="selectMethod('Upay')">Upay</div>
+                </div>
+                <button class="btn-main" onclick="goToStep(3)">পরবর্তী ধাপ</button>
+            </div>
+
+            <div id="step-3" class="step" style="display:none;">
+                <div style="background: #fdf2f6; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px;">
+                    <p>নিচের <b id="sel-method-name">...</b> নম্বরে টাকা পাঠান:</p>
+                    <h2 id="payment-number" style="color: var(--primary); letter-spacing: 1px; margin: 10px 0;">লোড হচ্ছে...</h2>
+                    <p id="fee-info" style="font-size: 13px; color: var(--green); font-weight: bold;"></p>
+                </div>
+                <input type="text" id="trx-id" placeholder="Transaction ID (TrxID)">
+                <button class="btn-main" onclick="finalSubmit()">আবেদন সম্পন্ন করুন</button>
+            </div>
+            <button onclick="closeModal()" style="width:100%; background:none; border:none; margin-top:15px; color:#777;">বাতিল করুন</button>
+        </div>
+    </div>
+
+    <div id="withdraw-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="color: var(--primary); text-align: center;">টাকা উত্তোলন</h3>
+            <input type="number" id="wd-amount" placeholder="পরিমাণ (৳)">
+            <select id="wd-method">
+                <option value="bKash">bKash</option>
+                <option value="Nagad">Nagad</option>
+                <option value="Rocket">Rocket</option>
+                <option value="Upay">Upay</option>
+            </select>
+            <input type="number" id="wd-number" placeholder="পেমেন্ট নম্বর">
+            <button class="btn-main" onclick="submitWithdraw()">উইথড্র রিকোয়েস্ট পাঠান</button>
+            <button onclick="closeModal()" style="width:100%; background:none; border:none; margin-top:15px; color:#777;">বাতিল করুন</button>
+        </div>
+    </div>
+
+    <div id="info-modal" class="modal">
+        <div class="modal-content" style="height: 70vh; overflow-y: auto;">
+            <h3 id="info-title" style="color: var(--primary);">লেনদেন ইতিহাস</h3>
+            <div id="info-body"></div>
+            <button class="btn-main" onclick="document.getElementById('info-modal').style.display='none'" style="margin-top:20px;">বন্ধ করুন</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav" id="b-nav" style="display: none;">
+        <div class="nav-link active-nav" onclick="location.reload()"><i class="fas fa-home" style="font-size: 18px;"></i><br>হোম</div>
+        <div class="nav-link" onclick="openWithdraw()"><i class="fas fa-wallet" style="font-size: 18px;"></i><br>উইথড্র</div>
+        <div class="nav-link" onclick="showSupport()"><i class="fas fa-headset" style="font-size: 18px;"></i><br>সাপোর্ট</div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCWNzlU0RLN05onwepfpNTadL7dxPl467Q",
+            authDomain: "my-cat-70db8.firebaseapp.com",
+            databaseURL: "https://my-cat-70db8-default-rtdb.firebaseio.com",
+            projectId: "my-cat-70db8",
+            storageBucket: "my-cat-70db8.firebasestorage.app",
+            messagingSenderId: "1019144594855",
+            appId: "1:1019144594855:web:81942b086bb56d32c20282"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let currentUserPhone = localStorage.getItem("userPhone");
+        let adminSettings = {};
+        let currentService = "";
+        let selectedPayMethod = "";
+        let userBalance = 0;
+        let calcVal = 0;
+
+        db.ref('settings').on('value', s => { adminSettings = s.val() || {}; });
+
+        function toggleAuth() {
+            const isReg = document.getElementById('reg-fields').style.display === 'block';
+            document.getElementById('reg-fields').style.display = isReg ? 'none' : 'block';
+            document.getElementById('auth-title').innerText = isReg ? 'লগইন করুন' : 'রেজিস্ট্রেশন করুন';
+        }
+
+        function handleAuth() {
+            const phone = document.getElementById('auth-phone').value;
+            const pin = document.getElementById('auth-pin').value;
+            if(phone.length < 11) return alert("সঠিক নম্বর দিন");
+            
+            db.ref('users/' + phone).once('value', s => {
+                if(s.exists()) {
+                    if(s.val().pin === pin) {
+                        localStorage.setItem("userPhone", phone);
+                        location.reload();
+                    } else alert("ভুল পিন!");
+                } else {
+                    const name = document.getElementById('reg-name').value;
+                    if(!name) return alert("নাম লিখুন");
+                    db.ref('users/' + phone).set({name, phone, pin, balance: 0, status: "Active"}).then(() => {
+                        localStorage.setItem("userPhone", phone);
+                        location.reload();
+                    });
+                }
+            });
+        }
+
+        if(currentUserPhone) {
+            document.getElementById('auth-section').style.display = "none";
+            document.getElementById('app-main').style.display = "block";
+            document.getElementById('b-nav').style.display = "flex";
+            
+            db.ref('users/' + currentUserPhone).on('value', s => {
+                const u = s.val();
+                if(!u) return;
+                userBalance = u.balance || 0;
+                document.getElementById('user-display-name').innerText = u.name;
+                document.getElementById('user-display-balance').innerText = "৳ " + userBalance.toLocaleString();
+                
+                if(u.message && !u.message.read) {
+                    document.getElementById('msg-alert').style.display = "block";
+                    document.getElementById('admin-msg').innerText = u.message.text;
+                }
+            });
+        }
+
+        function openService(type) {
+            closeModal();
+            currentService = type;
+            document.getElementById('modal-title').innerText = type.toUpperCase();
+            document.getElementById('srv-duration').style.display = (type === 'deposit' || type === 'installment') ? "none" : "block";
+            document.getElementById('loan-reason').style.display = (type === 'loan') ? "block" : "none";
+            const cont = document.getElementById('amount-container');
+
+            if(type === 'loan') {
+                document.getElementById('srv-label').innerText = "লোন পরিমাণ নির্বাচন করুন";
+                let opt = `<select id="srv-amount" onchange="updateCalculation()"><option value="">নির্বাচন করুন</option>`;
+                for(let i=5000; i<=100000; i+=5000) opt += `<option value="${i}">৳${i}</option>`;
+                cont.innerHTML = opt + `</select>`;
+            } else if(type === 'dps') {
+                document.getElementById('srv-label').innerText = "মাসিক কিস্তি নির্বাচন করুন";
+                let opt = `<select id="srv-amount" onchange="updateCalculation()"><option value="">নির্বাচন করুন</option>`;
+                for(let i=500; i<=5000; i+=500) opt += `<option value="${i}">৳${i}</option>`;
+                cont.innerHTML = opt + `</select>`;
+            } else {
+                document.getElementById('srv-label').innerText = "টাকার পরিমাণ লিখুন";
+                cont.innerHTML = `<input type="number" id="srv-amount" placeholder="৳ ০.০০" oninput="updateCalculation()">`;
+            }
+            
+            document.getElementById('service-modal').style.display = "block";
+            goToStep(1);
+        }
+
+        function updateCalculation() {
+            const amt = parseFloat(document.getElementById('srv-amount').value);
+            const mon = parseInt(document.getElementById('srv-duration').value);
+            const res = document.getElementById('calc-result');
+            if(!amt) return res.style.display="none";
+            res.style.display = "block";
+
+            if(currentService === 'loan') {
+                let rate = (adminSettings.rates?.loanInterest || 10) / 100;
+                let total = amt + (amt * rate);
+                calcVal = (total / mon).toFixed(2);
+                res.innerHTML = `মোট পরিশোধ: ৳${total} <br> মাসিক কিস্তি: ৳${calcVal}`;
+            } else if(currentService === 'dps') {
+                let rate = (adminSettings.rates?.dpsProfit || 12) / 100;
+                calcVal = amt;
+                res.innerHTML = `মেয়াদ শেষে পাবেন: ৳${(amt * mon * (1 + rate)).toFixed(0)}`;
+            } else {
+                calcVal = amt;
+                res.style.display = "none";
+            }
+        }
+
+        function goToStep(n) {
+            if(n === 2 && !document.getElementById('srv-amount').value) return alert("পরিমাণ দিন");
+            document.querySelectorAll('.step').forEach(s => s.style.display = "none");
+            document.getElementById('step-' + n).style.display = "block";
+            if(n === 3) document.getElementById('fee-info').innerText = "পরিশোধ করুন: ৳" + calcVal;
+        }
+
+        function selectMethod(m) {
+            selectedPayMethod = m;
+            document.querySelectorAll('.method').forEach(el => el.classList.remove('selected'));
+            document.getElementById('m-'+m).classList.add('selected');
+            document.getElementById('sel-method-name').innerText = m;
+            document.getElementById('payment-number').innerText = adminSettings.numbers?.[m] || "No Number Set";
+        }
+
+        function finalSubmit() {
+            const trx = document.getElementById('trx-id').value;
+            if(!trx || !selectedPayMethod) return alert("সব তথ্য দিন");
+            db.ref('allRequests').push({
+                phone: currentUserPhone, amount: document.getElementById('srv-amount').value,
+                type: currentService, method: selectedPayMethod, trx: trx,
+                status: "Pending", time: Date.now()
+            }).then(() => { alert("আবেদন জমা হয়েছে!"); closeModal(); });
+        }
+
+        function openWithdraw() { closeModal(); document.getElementById('withdraw-modal').style.display = "block"; }
+        
+        function submitWithdraw() {
+            const amt = parseFloat(document.getElementById('wd-amount').value);
+            const num = document.getElementById('wd-number').value;
+            const min = adminSettings.rates?.minWithdraw || 100;
+            if(amt < min) return alert("সর্বনিম্ন উইথড্র ৳"+min);
+            if(amt > userBalance) return alert("পর্যাপ্ত ব্যালেন্স নেই");
+            
+            db.ref('users/'+currentUserPhone).update({balance: userBalance - amt}).then(() => {
+                db.ref('allRequests').push({
+                    phone: currentUserPhone, amount: amt, type: 'withdraw',
+                    method: document.getElementById('wd-method').value, sender: num,
+                    status: "Pending", time: Date.now()
+                }).then(() => { alert("সফল হয়েছে!"); closeModal(); });
+            });
+        }
+
+        function showHistory() {
+            db.ref('allRequests').orderByChild('phone').equalTo(currentUserPhone).once('value', s => {
+                let h = "";
+                s.forEach(c => {
+                    const d = c.val();
+                    h += `<div style="padding:15px; border-bottom:1px solid #eee;">
+                        <b>${d.type.toUpperCase()}</b> <span style="float:right">৳${d.amount}</span><br>
+                        <small>${new Date(d.time).toLocaleDateString()} - ${d.status}</small>
+                    </div>`;
+                });
+                document.getElementById('info-body').innerHTML = h || "কোন তথ্য নেই";
+                document.getElementById('info-modal').style.display = "block";
+            });
+        }
+
+        function showSupport() { window.open("https://wa.me/" + (adminSettings.support?.whatsapp || ""), "_blank"); }
+        function openDepositSelector() { document.getElementById('deposit-selector-modal').style.display = "block"; }
+        function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); }
+        function logout() { localStorage.clear(); location.reload(); }
+    </script>
+</body>
+</html>
