@@ -1,393 +1,1398 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FF Wealth </title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FF Wealth </title>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --primary: #1a3c5e;
+  --accent: #e8a020;
+  --accent2: #27ae60;
+  --bg: #eef2f7;
+  --white: #ffffff;
+  --text: #1e2a38;
+  --text2: #5a6a7a;
+  --danger: #e74c3c;
+  --card-shadow: 0 4px 20px rgba(26,60,94,0.10);
+  --radius: 16px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Hind Siliguri', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
 
-    <meta name="google-site-verification" content="9ihfA2xZ-QJX_1J_qlo2wws2dM9BkDBGFe11yNu1TpA" />
+/* ====== AUTH ====== */
+#auth-wrap {
+  min-height: 100vh;
+  background: linear-gradient(145deg, #1a3c5e 0%, #0d2137 60%, #162d47 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 20px;
+  position: relative; overflow: hidden;
+}
+#auth-wrap::before {
+  content: '';
+  position: absolute; top: -80px; right: -80px;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(232,160,32,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+}
+#auth-wrap::after {
+  content: '';
+  position: absolute; bottom: -60px; left: -60px;
+  width: 250px; height: 250px;
+  background: radial-gradient(circle, rgba(39,174,96,0.10) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.auth-logo {
+  text-align: center; margin-bottom: 30px; position: relative; z-index: 2;
+}
+.auth-logo .logo-icon {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, var(--accent), #c8870a);
+  border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 12px;
+  box-shadow: 0 8px 24px rgba(232,160,32,0.35);
+}
+.auth-logo .logo-icon i { font-size: 32px; color: white; }
+.auth-logo h1 { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; color: white; letter-spacing: 1px; }
+.auth-logo p { font-size: 13px; color: rgba(255,255,255,0.55); margin-top: 4px; }
+.auth-card {
+  background: white;
+  border-radius: 24px;
+  padding: 30px 24px;
+  width: 100%; max-width: 390px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  position: relative; z-index: 2;
+}
+.auth-card h2 { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
+.auth-card p.sub { font-size: 13px; color: var(--text2); margin-bottom: 22px; }
+.input-group {
+  margin-bottom: 14px; position: relative;
+}
+.input-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.input-group input {
+  width: 100%; padding: 13px 14px 13px 42px;
+  border: 1.5px solid #dde3ea;
+  border-radius: 12px; font-size: 15px;
+  font-family: 'Hind Siliguri', sans-serif;
+  outline: none; transition: 0.2s;
+  color: var(--text);
+}
+.input-group input:focus { border-color: var(--primary); background: #f8fafd; }
+.input-group .inp-icon {
+  position: absolute; left: 14px; bottom: 14px; color: #a0b0c0; font-size: 14px;
+}
+.btn-auth {
+  width: 100%; padding: 15px;
+  background: linear-gradient(135deg, var(--primary), #26537a);
+  color: white; border: none; border-radius: 12px;
+  font-size: 16px; font-weight: 700;
+  font-family: 'Hind Siliguri', sans-serif;
+  cursor: pointer; margin-top: 6px;
+  transition: 0.2s; letter-spacing: 0.5px;
+  box-shadow: 0 6px 20px rgba(26,60,94,0.30);
+}
+.btn-auth:active { transform: scale(0.98); }
+.auth-toggle { text-align: center; margin-top: 18px; font-size: 14px; color: var(--text2); }
+.auth-toggle span { color: var(--primary); font-weight: 700; cursor: pointer; }
 
-    
-    <meta name="clckd" content="70641c652140017860fe2d2283712ba8" />
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        :root { --primary: #C2185B; --secondary: #880E4F; --bg: #F4F6F8; --white: #ffffff; --green: #2E7D32; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; touch-action: manipulation; }
-        
-        body { background-color: var(--bg); margin: 0; padding: 0; overflow-x: hidden; width: 100%; height: 100%; }
+/* ====== MAIN APP ====== */
+#app-main { display: none; min-height: 100vh; padding-bottom: 70px; }
 
-        /* --- Animated Premium Banner --- */
-        .header { background: var(--primary); color: white; padding: 20px 20px 60px; border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; position: relative; }
-        
-        .hero-banner {
-            margin: 15px 0;
-            height: 130px;
-            background: linear-gradient(-45deg, #C2185B, #ec407a, #880e4f, #ad1457);
-            background-size: 400% 400%;
-            animation: gradientBG 10s ease infinite;
-            border-radius: 25px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            box-shadow: 0 8px 20px rgba(194, 24, 91, 0.3);
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .hero-banner h1 { margin: 0; font-size: 26px; font-weight: 900; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-        .hero-banner p { margin: 5px 0 0; font-size: 13px; opacity: 0.9; font-weight: 500; }
+/* HEADER */
+.app-header {
+  background: linear-gradient(135deg, #1a3c5e 0%, #0d2137 100%);
+  padding: 0 18px 70px;
+  position: relative; overflow: hidden;
+}
+.app-header::before {
+  content: '';
+  position: absolute; top: -50px; right: -50px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(232,160,32,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.header-top {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 18px; padding-bottom: 14px;
+}
+.header-top .user-info .greet { font-size: 12px; color: rgba(255,255,255,0.55); }
+.header-top .user-info .uname { font-size: 18px; font-weight: 700; color: white; }
+.header-top .notif-btn {
+  width: 40px; height: 40px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative;
+}
+.header-top .notif-btn i { color: white; font-size: 16px; }
+.badge { position: absolute; top: -2px; right: -2px; width: 14px; height: 14px; background: var(--accent); border-radius: 50%; font-size: 9px; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; }
 
-        /* --- Admin Message Alert --- */
-        #msg-alert { display: none; background: #fff9c4; color: #827717; padding: 12px; margin: 10px 20px; border-radius: 12px; font-size: 13px; border-left: 5px solid #fbc02d; animation: slideIn 0.5s; }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+/* BALANCE CARD */
+.balance-hero {
+  background: linear-gradient(135deg, #e8a020, #c8870a);
+  border-radius: 20px;
+  padding: 22px 20px;
+  margin: -50px 18px 0;
+  position: relative; z-index: 10;
+  box-shadow: 0 8px 30px rgba(232,160,32,0.40);
+  overflow: hidden;
+}
+.balance-hero::before {
+  content: '';
+  position: absolute; right: -20px; top: -20px;
+  width: 120px; height: 120px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50%;
+}
+.balance-hero .bal-label { font-size: 12px; color: rgba(255,255,255,0.75); font-weight: 500; }
+.balance-hero .bal-amount { font-family: 'Poppins', sans-serif; font-size: 32px; font-weight: 800; color: white; margin: 4px 0 12px; }
+.balance-hero .bal-meta { display: flex; gap: 20px; }
+.balance-hero .bal-meta-item { background: rgba(255,255,255,0.15); border-radius: 10px; padding: 8px 12px; flex: 1; }
+.balance-hero .bal-meta-item .bm-label { font-size: 10px; color: rgba(255,255,255,0.75); }
+.balance-hero .bal-meta-item .bm-val { font-size: 14px; font-weight: 700; color: white; }
 
-        .balance-card { background: white; margin: -40px 20px 20px; padding: 25px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); text-align: center; position: relative; z-index: 10; border: 1px solid #eee; }
-        .balance-card h2 { color: var(--primary); font-size: 32px; margin: 8px 0; font-weight: 900; }
+/* QUICK ACTIONS */
+.section-title { font-size: 14px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin: 22px 18px 12px; }
+.quick-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 10px; padding: 0 18px;
+}
+.quick-item {
+  background: white; border-radius: 14px; padding: 14px 8px;
+  text-align: center; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  transition: 0.2s;
+}
+.quick-item:active { transform: scale(0.93); box-shadow: none; }
+.quick-item .qi-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 8px;
+}
+.quick-item .qi-icon i { font-size: 18px; color: white; }
+.quick-item p { font-size: 11px; font-weight: 600; color: var(--text); }
+.qi-blue { background: linear-gradient(135deg, #2980b9, #1a6fa0); }
+.qi-green { background: linear-gradient(135deg, #27ae60, #1e8a4a); }
+.qi-orange { background: linear-gradient(135deg, #e8a020, #c8870a); }
+.qi-purple { background: linear-gradient(135deg, #8e44ad, #6c3483); }
+.qi-teal { background: linear-gradient(135deg, #16a085, #0e7a65); }
+.qi-red { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+.qi-navy { background: linear-gradient(135deg, #1a3c5e, #0d2137); }
+.qi-gray { background: linear-gradient(135deg, #636e72, #4a5568); }
 
-        .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 10px 20px; }
-        .menu-item { background: white; padding: 18px 10px; text-align: center; border-radius: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.04); cursor: pointer; transition: 0.2s; border: 1px solid #f0f0f0; }
-        .menu-item:active { transform: scale(0.9); background: #fdf2f6; }
-        .menu-item i { font-size: 26px; color: var(--primary); margin-bottom: 10px; }
-        .menu-item p { font-size: 12px; font-weight: bold; margin: 0; color: #444; }
+/* LOAN STATUS CARD */
+.loan-status-card {
+  margin: 0 18px 16px;
+  background: white; border-radius: 16px;
+  padding: 16px; box-shadow: var(--card-shadow);
+  border-left: 4px solid var(--accent2);
+}
+.loan-status-card .ls-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.loan-status-card .ls-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.ls-badge { font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+.ls-approved { background: #e8f5e9; color: #27ae60; }
+.ls-pending { background: #fff3e0; color: #e8a020; }
+.ls-none { background: #f0f4f8; color: #888; }
+.ls-progress-bar { background: #eee; border-radius: 10px; height: 6px; margin: 8px 0; }
+.ls-progress-fill { background: linear-gradient(90deg, var(--accent2), #1e8a4a); height: 100%; border-radius: 10px; transition: 0.5s; }
+.ls-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); }
 
-        /* Modal Styles */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; overflow-y: auto; }
-        .modal-content { background: white; width: 100%; min-height: 45vh; position: absolute; bottom: 0; border-top-left-radius: 35px; border-top-right-radius: 35px; padding: 30px; animation: slideUp 0.4s cubic-bezier(0, 1, 0.5, 1); }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+/* RECENT TRANSACTIONS */
+.txn-list { padding: 0 18px; display: flex; flex-direction: column; gap: 8px; }
+.txn-item {
+  background: white; border-radius: 14px; padding: 13px 15px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.txn-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.txn-icon i { font-size: 16px; color: white; }
+.txn-info { flex: 1; }
+.txn-info .ti-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.txn-info .ti-date { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.txn-amount { font-size: 14px; font-weight: 700; }
+.txn-amount.credit { color: var(--accent2); }
+.txn-amount.debit { color: var(--danger); }
 
-        .btn-main { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; box-shadow: 0 4px 10px rgba(194, 24, 91, 0.2); }
-        .btn-main:active { transform: scale(0.98); }
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed; bottom: 0; width: 100%; max-width: 480px;
+  left: 50%; transform: translateX(-50%);
+  background: white; display: flex; justify-content: space-around; padding: 10px 0 14px;
+  border-top: 1px solid #e8ecf0;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  z-index: 900;
+}
+.bn-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 0 14px; }
+.bn-item i { font-size: 20px; color: #a0b0c0; transition: 0.2s; }
+.bn-item span { font-size: 10px; font-weight: 600; color: #a0b0c0; transition: 0.2s; }
+.bn-item.active i, .bn-item.active span { color: var(--primary); }
 
-        .method { border: 2px solid #f0f0f0; padding: 15px; border-radius: 18px; cursor: pointer; text-align: center; transition: 0.3s; }
-        .method.selected { border-color: var(--primary); background: #fdf2f6; }
-        
-        input, select { width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #eee; border-radius: 12px; outline: none; background: #f9f9f9; }
-        input:focus { border-color: var(--primary); background: #fff; }
+/* ====== MODALS ====== */
+.modal-overlay {
+  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(10,20,35,0.65); z-index: 1000;
+  align-items: flex-end; justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal-sheet {
+  background: white; width: 100%; max-width: 480px;
+  border-radius: 24px 24px 0 0; padding: 0;
+  max-height: 92vh; overflow-y: auto;
+  animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle { width: 40px; height: 4px; background: #dde3ea; border-radius: 4px; margin: 14px auto 0; }
+.modal-header { padding: 16px 22px 14px; border-bottom: 1px solid #f0f4f8; display: flex; align-items: center; gap: 12px; }
+.modal-header .mh-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.modal-header .mh-icon i { font-size: 18px; color: white; }
+.modal-header .mh-title { font-size: 17px; font-weight: 700; color: var(--text); }
+.modal-header .mh-sub { font-size: 12px; color: var(--text2); }
+.modal-body { padding: 18px 22px; }
+.modal-close { margin-left: auto; width: 32px; height: 32px; background: #f0f4f8; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.modal-close i { font-size: 13px; color: var(--text2); }
 
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 900; }
-        .nav-link { text-align: center; color: #888; text-decoration: none; font-size: 11px; font-weight: 600; }
-        .active-nav { color: var(--primary); }
-    </style>
+/* Form elements in modal */
+.form-label { font-size: 12px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
+.form-input {
+  width: 100%; padding: 13px 14px; border: 1.5px solid #dde3ea;
+  border-radius: 12px; font-size: 15px; font-family: 'Hind Siliguri', sans-serif;
+  color: var(--text); outline: none; margin-bottom: 14px; transition: 0.2s;
+}
+.form-input:focus { border-color: var(--primary); background: #f8fafd; }
+.form-select {
+  width: 100%; padding: 13px 14px; border: 1.5px solid #dde3ea;
+  border-radius: 12px; font-size: 15px; font-family: 'Hind Siliguri', sans-serif;
+  color: var(--text); outline: none; margin-bottom: 14px; background: white;
+}
+
+/* RANGE SLIDER */
+.range-input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1.5px solid #dde3ea;
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: 'Hind Siliguri', sans-serif;
+  margin-bottom: 8px;
+}
+
+.range-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  margin-bottom: 12px;
+}
+
+.range-display .range-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.range-display .range-label {
+  font-size: 12px;
+  color: var(--text2);
+}
+
+/* Steps */
+.step-indicator {
+  display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 22px;
+}
+.step-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #eee; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #aaa; position: relative;
+}
+.step-dot.active { background: var(--primary); color: white; }
+.step-dot.done { background: var(--accent2); color: white; }
+.step-line { width: 40px; height: 2px; background: #eee; }
+.step-line.done { background: var(--accent2); }
+.step-content { display: none; }
+.step-content.active { display: block; }
+
+/* Calc box */
+.calc-result-box {
+  background: linear-gradient(135deg, #e8f5e9, #d4edda);
+  border: 1.5px solid #a5d6a7; border-radius: 14px;
+  padding: 14px; margin-bottom: 14px; text-align: center;
+}
+.calc-result-box .cr-main { font-size: 15px; font-weight: 700; color: #2e7d32; }
+.calc-result-box .cr-sub { font-size: 12px; color: #388e3c; margin-top: 4px; }
+
+/* Payment methods */
+.pay-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.pay-method {
+  border: 2px solid #eee; border-radius: 14px; padding: 14px 10px;
+  cursor: pointer; text-align: center; transition: 0.2s;
+}
+.pay-method:active { transform: scale(0.96); }
+.pay-method.selected { border-color: var(--primary); background: #f0f5ff; }
+.pay-method .pm-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; }
+.pay-method .pm-icon i { font-size: 16px; color: white; }
+.pay-method .pm-name { font-size: 13px; font-weight: 700; color: var(--text); }
+
+/* Payment info box */
+.pay-info-box {
+  background: #f8fafd; border: 1.5px solid #dde3ea;
+  border-radius: 14px; padding: 16px; margin-bottom: 14px; text-align: center;
+}
+.pay-info-box .pib-method { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+.pay-info-box .pib-num { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 800; color: var(--primary); margin: 4px 0; letter-spacing: 1px; }
+.pay-info-box .pib-amt { font-size: 13px; color: var(--accent2); font-weight: 700; }
+
+/* Button styles */
+.btn-primary {
+  width: 100%; padding: 15px; border: none; border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary), #26537a);
+  color: white; font-size: 16px; font-weight: 700;
+  font-family: 'Hind Siliguri', sans-serif;
+  cursor: pointer; transition: 0.2s;
+  box-shadow: 0 6px 20px rgba(26,60,94,0.28);
+  margin-bottom: 10px;
+}
+.btn-primary:active { transform: scale(0.98); }
+.btn-secondary {
+  width: 100%; padding: 13px; border: 1.5px solid #dde3ea; border-radius: 14px;
+  background: white; color: var(--text2); font-size: 14px; font-weight: 600;
+  font-family: 'Hind Siliguri', sans-serif; cursor: pointer; transition: 0.2s;
+}
+.btn-secondary:active { background: #f0f4f8; }
+.btn-danger { background: linear-gradient(135deg, var(--danger), #c0392b); }
+.btn-accent { background: linear-gradient(135deg, var(--accent), #c8870a); }
+
+/* Repay info box */
+.repay-alert {
+  background: #fff8e1; border: 1.5px solid #ffc107;
+  border-radius: 14px; padding: 14px; margin-bottom: 14px;
+}
+.repay-alert .ra-title { font-size: 13px; font-weight: 700; color: #e65100; margin-bottom: 6px; }
+.repay-alert .ra-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--text); margin-bottom: 4px; }
+.repay-alert .ra-row span:last-child { font-weight: 700; color: var(--primary); }
+
+/* History page */
+.history-filter { display: flex; gap: 8px; padding: 0 18px; margin-bottom: 14px; overflow-x: auto; }
+.hf-chip {
+  padding: 7px 16px; border-radius: 20px; font-size: 12px; font-weight: 700;
+  white-space: nowrap; cursor: pointer; border: 1.5px solid #dde3ea;
+  background: white; color: var(--text2); transition: 0.2s;
+}
+.hf-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* Page sections */
+.page-section { display: none; padding-top: 8px; }
+.page-section.active { display: block; }
+
+/* Withdraw modal override */
+.wd-balance-info { background: #f8fafd; border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 14px; border: 1.5px solid #dde3ea; }
+.wd-balance-info .wbi-label { font-size: 12px; color: var(--text2); }
+.wd-balance-info .wbi-val { font-size: 24px; font-weight: 800; font-family: 'Poppins'; color: var(--primary); margin-top: 4px; }
+
+/* Profile */
+.profile-header { text-align: center; padding: 24px 18px 16px; }
+.profile-avatar { width: 72px; height: 72px; border-radius: 20px; background: linear-gradient(135deg, var(--primary), #26537a); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+.profile-avatar i { font-size: 30px; color: white; }
+.profile-name { font-size: 20px; font-weight: 700; color: var(--text); }
+.profile-phone { font-size: 13px; color: var(--text2); margin-top: 4px; }
+.profile-cards { padding: 0 18px; display: flex; flex-direction: column; gap: 10px; }
+.profile-item { background: white; border-radius: 14px; padding: 15px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; }
+.profile-item .pi-icon { width: 38px; height: 38px; border-radius: 10px; background: #f0f5ff; display: flex; align-items: center; justify-content: center; }
+.profile-item .pi-icon i { font-size: 16px; color: var(--primary); }
+.profile-item .pi-text { flex: 1; }
+.profile-item .pi-text .pit-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.profile-item .pi-text .pit-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.profile-item .pi-chevron { color: #bbb; font-size: 14px; }
+.profile-item.danger .pi-icon { background: #fff0f0; }
+.profile-item.danger .pi-icon i { color: var(--danger); }
+
+/* Support */
+.support-cards { padding: 0 18px; display: flex; flex-direction: column; gap: 10px; }
+.support-card { background: white; border-radius: 16px; padding: 18px; box-shadow: var(--card-shadow); display: flex; align-items: center; gap: 14px; cursor: pointer; }
+.support-card .sc-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.support-card .sc-icon i { font-size: 20px; color: white; }
+.support-card .sc-info .sc-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.support-card .sc-info .sc-sub { font-size: 12px; color: var(--text2); margin-top: 3px; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 40px 20px; }
+.empty-state i { font-size: 48px; color: #d0d8e0; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; color: var(--text2); }
+
+/* Notification */
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: #1e2a38; color: white; padding: 12px 22px;
+  border-radius: 50px; font-size: 14px; font-weight: 600; z-index: 9999;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3); animation: toastIn 0.3s ease;
+  white-space: nowrap; max-width: 90vw; text-align: center;
+}
+.toast.success { background: #27ae60; }
+.toast.error { background: #e74c3c; }
+@keyframes toastIn { from { opacity: 0; top: -20px; } to { opacity: 1; top: 20px; } }
+</style>
 </head>
 <body>
 
-    <div id="auth-section" style="padding: 50px 25px; text-align: center;">
-        <h2 id="auth-title" style="color: var(--primary); font-size: 28px;">FF WEALTH</h2>
-        <div id="reg-fields" style="display: none;">
-            <input type="text" id="reg-name" placeholder="আপনার পুরো নাম">
+<!-- AUTH SECTION -->
+<div id="auth-wrap">
+  <div class="auth-logo">
+    <div class="logo-icon"><i class="fas fa-university"></i></div>
+    <h1>FF WEALTH FINANCE</h1>
+    <p>আপনার বিশ্বস্ত আর্থিক সেবা প্রদানকারী</p>
+  </div>
+  <div class="auth-card">
+    <h2 id="auth-title">স্বাগতম!</h2>
+    <p class="sub" id="auth-sub">আপনার অ্যাকাউন্টে প্রবেশ করুন</p>
+    <div id="reg-field" style="display:none">
+      <div class="input-group">
+        <label>পূর্ণ নাম</label>
+        <i class="fas fa-user inp-icon"></i>
+        <input type="text" id="reg-name" placeholder="আপনার পুরো নাম লিখুন">
+      </div>
+    </div>
+    <div class="input-group">
+      <label>মোবাইল নম্বর</label>
+      <i class="fas fa-phone inp-icon"></i>
+      <input type="number" id="auth-phone" placeholder="01XXXXXXXXX">
+    </div>
+    <div class="input-group">
+      <label>৪ সংখ্যার পিন</label>
+      <i class="fas fa-lock inp-icon"></i>
+      <input type="password" id="auth-pin" maxlength="4" placeholder="••••">
+    </div>
+    <button class="btn-auth" onclick="handleAuth()"><i class="fas fa-arrow-right" style="margin-right:8px"></i><span id="auth-btn-text">লগইন করুন</span></button>
+    <div class="auth-toggle">
+      <span id="toggle-text" onclick="toggleAuth()"></span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-main">
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="header-top">
+      <div class="user-info">
+        <div class="greet">সুপ্রভাত 👋</div>
+        <div class="uname" id="user-display-name">লোড হচ্ছে...</div>
+      </div>
+      <div class="notif-btn" onclick="showToast('কোনো নতুন নোটিফিকেশন নেই', 'info')">
+        <i class="fas fa-bell"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME PAGE -->
+  <div id="page-home" class="page-section active">
+    <!-- BALANCE CARD -->
+    <div class="balance-hero">
+      <div class="bal-label">মোট অ্যাকাউন্ট ব্যালেন্স</div>
+      <div class="bal-amount" id="user-display-balance">৳ 0.00</div>
+      <div class="bal-meta">
+        <div class="bal-meta-item">
+          <div class="bm-label">লোন স্ট্যাটাস</div>
+          <div class="bm-val" id="bal-loan-status">কোনো লোন নেই</div>
         </div>
-        <input type="number" id="auth-phone" placeholder="মোবাইল নম্বর">
-        <input type="password" id="auth-pin" maxlength="4" placeholder="৪ সংখ্যার পিন">
-        <button class="btn-main" onclick="handleAuth()">প্রবেশ করুন</button>
-        <p id="toggle-text" onclick="toggleAuth()" style="margin-top: 20px; color: #666;">নতুন অ্যাকাউন্ট? <b>রেজিস্ট্রেশন</b></p>
+        <div class="bal-meta-item">
+          <div class="bm-label">অ্যাকাউন্ট ID</div>
+          <div class="bm-val" id="bal-acc-id">---</div>
+        </div>
+      </div>
     </div>
 
-    <div id="app-main" style="display: none; padding-bottom: 80px;">
-        <div class="header">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div><p style="margin:0; opacity:0.8; font-size: 13px;">স্বাগতম,</p><h3 id="user-display-name" style="margin:0;">...</h3></div>
-                <i class="fas fa-sign-out-alt" onclick="logout()" style="font-size: 20px; background: rgba(255,255,255,0.2); padding: 10px; border-radius: 12px;"></i>
-            </div>
-            <div class="hero-banner">
-                <h1>FF WEALTH</h1>
-                <p>নিরাপদ ও দ্রুত আর্থিক সমাধান</p>
-            </div>
-        </div>
-
-        <div id="msg-alert" onclick="this.style.display='none'">
-            <i class="fas fa-envelope-open-text"></i> <span id="admin-msg"></span>
-        </div>
-
-        <div class="balance-card">
-            <p style="margin:0; font-size:14px; color:#777; font-weight: 600;">মোট ব্যালেন্স</p>
-            <h2 id="user-display-balance">৳ 0.00</h2>
-        </div>
-
-        <div class="menu-grid">
-            <div class="menu-item" onclick="openService('loan')"><i class="fas fa-hand-holding-usd"></i><p>লোন আবেদন</p></div>
-            <div class="menu-item" onclick="openService('dps')"><i class="fas fa-piggy-bank"></i><p>ডিপিএস</p></div>
-            <div class="menu-item" onclick="openDepositSelector()"><i class="fas fa-wallet"></i><p>ডিপোজিট</p></div>
-            <div class="menu-item" onclick="openWithdraw()"><i class="fas fa-hand-holding-heart"></i><p>উইথড্র</p></div>
-            <div class="menu-item" onclick="showHistory()"><i class="fas fa-history"></i><p>লেনদেন</p></div>
-            <div class="menu-item" onclick="showSupport()"><i class="fas fa-headset"></i><p>সাপোর্ট</p></div>
-        </div>
+    <!-- QUICK ACTIONS -->
+    <div class="section-title">দ্রুত সেবাসমূহ</div>
+    <div class="quick-grid">
+      <div class="quick-item" onclick="openLoanModal()">
+        <div class="qi-icon qi-blue"><i class="fas fa-hand-holding-usd"></i></div>
+        <p>লোন</p>
+      </div>
+      <div class="quick-item" onclick="openDpsModal()">
+        <div class="qi-icon qi-green"><i class="fas fa-piggy-bank"></i></div>
+        <p>ডিপিএস</p>
+      </div>
+      <div class="quick-item" onclick="openDepositModal()">
+        <div class="qi-icon qi-orange"><i class="fas fa-wallet"></i></div>
+        <p>ডিপোজিট</p>
+      </div>
+      <div class="quick-item" onclick="openWithdrawModal()">
+        <div class="qi-icon qi-teal"><i class="fas fa-money-bill-wave"></i></div>
+        <p>উইথড্র</p>
+      </div>
+      <div class="quick-item" onclick="openRepayModal()">
+        <div class="qi-icon qi-purple"><i class="fas fa-calendar-check"></i></div>
+        <p>কিস্তি</p>
+      </div>
+      <div class="quick-item" onclick="showPage('page-history')">
+        <div class="qi-icon qi-navy"><i class="fas fa-history"></i></div>
+        <p>লেনদেন</p>
+      </div>
+      <div class="quick-item" onclick="showPage('page-support')">
+        <div class="qi-icon qi-gray"><i class="fas fa-headset"></i></div>
+        <p>সাপোর্ট</p>
+      </div>
+      <div class="quick-item" onclick="showPage('page-profile')">
+        <div class="qi-icon qi-red"><i class="fas fa-user"></i></div>
+        <p>প্রোফাইল</p>
+      </div>
     </div>
 
-    <div id="deposit-selector-modal" class="modal">
-        <div class="modal-content">
-            <h3 style="text-align: center; color: var(--primary);">জমা করার ধরন</h3>
-            <button class="btn-main" onclick="openService('deposit')">সাধারণ ডিপোজিট</button>
-            <button class="btn-main" style="background:#ff9800; margin-top:10px;" onclick="openService('installment')">লোন কিস্তি পরিশোধ</button>
-            <button onclick="closeModal()" style="width:100%; background:none; border:none; margin-top:15px; color:#777;">বন্ধ করুন</button>
+    <!-- ACTIVE LOAN STATUS -->
+    <div class="section-title">লোন অবস্থা</div>
+    <div id="loan-status-section" style="padding: 0 18px; margin-bottom: 16px;"></div>
+
+    <!-- RECENT TRANSACTIONS -->
+    <div class="section-title">সাম্প্রতিক লেনদেন</div>
+    <div id="recent-txn" class="txn-list" style="margin-bottom: 16px;"></div>
+  </div>
+
+  <!-- HISTORY PAGE -->
+  <div id="page-history" class="page-section">
+    <div style="padding: 14px 18px 8px; display: flex; align-items: center; gap: 12px;">
+      <div onclick="showPage('page-home')" style="cursor:pointer; width:36px; height:36px; background:white; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.1)"><i class="fas fa-arrow-left" style="color:var(--primary); font-size:14px"></i></div>
+      <h3 style="font-size:17px; font-weight:700; color:var(--text)">লেনদেন ইতিহাস</h3>
+    </div>
+    <div class="history-filter">
+      <div class="hf-chip active" onclick="filterHistory('all', this)">সব</div>
+      <div class="hf-chip" onclick="filterHistory('loan', this)">লোন</div>
+      <div class="hf-chip" onclick="filterHistory('deposit', this)">ডিপোজিট</div>
+      <div class="hf-chip" onclick="filterHistory('dps', this)">ডিপিএস</div>
+      <div class="hf-chip" onclick="filterHistory('withdraw', this)">উইথড্র</div>
+      <div class="hf-chip" onclick="filterHistory('installment', this)">কিস্তি</div>
+    </div>
+    <div id="full-history" class="txn-list" style="margin-bottom: 16px;"></div>
+  </div>
+
+  <!-- SUPPORT PAGE -->
+  <div id="page-support" class="page-section">
+    <div style="padding: 14px 18px 8px; display: flex; align-items: center; gap: 12px;">
+      <div onclick="showPage('page-home')" style="cursor:pointer; width:36px; height:36px; background:white; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.1)"><i class="fas fa-arrow-left" style="color:var(--primary); font-size:14px"></i></div>
+      <h3 style="font-size:17px; font-weight:700; color:var(--text)">গ্রাহক সেবা</h3>
+    </div>
+    <div style="padding: 0 18px 14px;">
+      <div style="background: linear-gradient(135deg, var(--primary), #26537a); border-radius: 16px; padding: 20px; color: white; margin-bottom: 16px;">
+        <i class="fas fa-headset" style="font-size:28px; opacity:0.8; margin-bottom:8px;"></i>
+        <h3 style="font-size:16px; margin-bottom:4px;">আমরা সদা প্রস্তুত</h3>
+        <p style="font-size:12px; opacity:0.75;">২৪/৭ গ্রাহক সেবা প্রদান করা হয়। যেকোনো সমস্যায় আমাদের সাথে যোগাযোগ করুন।</p>
+      </div>
+    </div>
+    <div class="support-cards">
+      <div class="support-card" onclick="openWhatsApp()">
+        <div class="sc-icon" style="background: linear-gradient(135deg, #25d366, #1da851)"><i class="fab fa-whatsapp"></i></div>
+        <div class="sc-info"><div class="sc-title">WhatsApp সাপোর্ট</div><div class="sc-sub">সরাসরি মেসেজ করুন</div></div>
+        <i class="fas fa-chevron-right" style="color:#ccc; margin-left:auto"></i>
+      </div>
+      <div class="support-card" onclick="openPhoneSupport()">
+        <div class="sc-icon" style="background: linear-gradient(135deg, #2980b9, #1a6fa0)"><i class="fas fa-phone-alt"></i></div>
+        <div class="sc-info"><div class="sc-title">ফোন সাপোর্ট</div><div class="sc-sub">সরাসরি কল করুন</div></div>
+        <i class="fas fa-chevron-right" style="color:#ccc; margin-left:auto"></i>
+      </div>
+      <div class="support-card" onclick="openFaq()">
+        <div class="sc-icon" style="background: linear-gradient(135deg, #8e44ad, #6c3483)"><i class="fas fa-question-circle"></i></div>
+        <div class="sc-info"><div class="sc-title">সাধারণ জিজ্ঞাসা (FAQ)</div><div class="sc-sub">সাধারণ প্রশ্নের উত্তর</div></div>
+        <i class="fas fa-chevron-right" style="color:#ccc; margin-left:auto"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div id="page-profile" class="page-section">
+    <div style="padding: 14px 18px 0; display: flex; align-items: center; gap: 12px;">
+      <div onclick="showPage('page-home')" style="cursor:pointer; width:36px; height:36px; background:white; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,0.1)"><i class="fas fa-arrow-left" style="color:var(--primary); font-size:14px"></i></div>
+      <h3 style="font-size:17px; font-weight:700; color:var(--text)">প্রোফাইল</h3>
+    </div>
+    <div class="profile-header">
+      <div class="profile-avatar"><i class="fas fa-user"></i></div>
+      <div class="profile-name" id="prof-name">---</div>
+      <div class="profile-phone" id="prof-phone">---</div>
+    </div>
+    <div class="profile-cards">
+      <div class="profile-item">
+        <div class="pi-icon"><i class="fas fa-star"></i></div>
+        <div class="pi-text"><div class="pit-title">অ্যাকাউন্ট স্ট্যাটাস</div><div class="pit-sub" id="prof-status">Active</div></div>
+        <i class="fas fa-chevron-right pi-chevron"></i>
+      </div>
+      <div class="profile-item" onclick="openWithdrawModal()">
+        <div class="pi-icon"><i class="fas fa-money-bill-wave"></i></div>
+        <div class="pi-text"><div class="pit-title">টাকা উত্তোলন করুন</div><div class="pit-sub">Withdraw Request</div></div>
+        <i class="fas fa-chevron-right pi-chevron"></i>
+      </div>
+      <div class="profile-item" onclick="showPage('page-history')">
+        <div class="pi-icon"><i class="fas fa-history"></i></div>
+        <div class="pi-text"><div class="pit-title">লেনদেনের ইতিহাস</div><div class="pit-sub">সব রেকর্ড দেখুন</div></div>
+        <i class="fas fa-chevron-right pi-chevron"></i>
+      </div>
+      <div class="profile-item danger" onclick="logout()">
+        <div class="pi-icon"><i class="fas fa-sign-out-alt"></i></div>
+        <div class="pi-text"><div class="pit-title" style="color:var(--danger)">লগ আউট</div><div class="pit-sub">অ্যাকাউন্ট থেকে বের হন</div></div>
+        <i class="fas fa-chevron-right pi-chevron"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="bn-item active" id="bn-home" onclick="showPage('page-home'); setNav('bn-home')">
+      <i class="fas fa-home"></i><span>হোম</span>
+    </div>
+    <div class="bn-item" id="bn-loan" onclick="openLoanModal(); setNav('bn-loan')">
+      <i class="fas fa-hand-holding-usd"></i><span>লোন</span>
+    </div>
+    <div class="bn-item" id="bn-txn" onclick="showPage('page-history'); setNav('bn-txn')">
+      <i class="fas fa-exchange-alt"></i><span>লেনদেন</span>
+    </div>
+    <div class="bn-item" id="bn-profile" onclick="showPage('page-profile'); setNav('bn-profile')">
+      <i class="fas fa-user"></i><span>প্রোফাইল</span>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODALS ====== -->
+
+<!-- LOAN MODAL -->
+<div class="modal-overlay" id="modal-loan">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="mh-icon" style="background: linear-gradient(135deg, #2980b9, #1a6fa0)"><i class="fas fa-hand-holding-usd"></i></div>
+      <div><div class="mh-title">লোন আবেদন</div><div class="mh-sub">সহজ কিস্তিতে ঋণ সুবিধা</div></div>
+      <div class="modal-close" onclick="closeModal('modal-loan')"><i class="fas fa-times"></i></div>
+    </div>
+    <div class="modal-body">
+      <div class="step-indicator">
+        <div class="step-dot active" id="loan-sd-1">१</div>
+        <div class="step-line" id="loan-sl-1"></div>
+        <div class="step-dot" id="loan-sd-2">२</div>
+        <div class="step-line" id="loan-sl-2"></div>
+        <div class="step-dot" id="loan-sd-3">३</div>
+      </div>
+      <!-- Step 1 -->
+      <div class="step-content active" id="loan-step-1">
+        <label class="form-label">লোনের পরিমাণ (৳)</label>
+        <div class="range-display">
+          <span class="range-label">টাকা:</span>
+          <span class="range-value" id="loan-amount-display">১০,০০০</span>
         </div>
-    </div>
-
-    <div id="service-modal" class="modal">
-        <div class="modal-content">
-            <h3 id="modal-title" style="text-align: center; color: var(--primary);">সার্ভিস</h3>
-            <div id="step-1" class="step">
-                <label id="srv-label" style="font-weight: bold; font-size: 14px; color: #555;"></label>
-                <div id="amount-container"></div>
-                
-                <select id="loan-reason" style="display:none;">
-                    <option value="">লোনের কারণ</option>
-                    <option value="Personal">ব্যক্তিগত</option>
-                    <option value="Business">ব্যবসা</option>
-                    <option value="Medical">চিকিৎসা</option>
-                </select>
-
-                <select id="srv-duration" onchange="updateCalculation()">
-                    <option value="6">৬ মাস</option>
-                    <option value="12">১২ মাস</option>
-                    <option value="24">২৪ মাস</option>
-                </select>
-                <div id="calc-result" style="background: #e8f5e9; padding: 15px; border-radius: 12px; margin: 10px 0; color: #2e7d32; font-weight: bold; font-size: 14px; text-align: center; display: none;"></div>
-                <button class="btn-main" onclick="goToStep(2)">পরবর্তী ধাপে যান</button>
-            </div>
-
-            <div id="step-2" class="step" style="display:none;">
-                <p style="text-align: center; font-weight: bold;">পেমেন্ট মেথড বেছে নিন</p>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-                    <div class="method" id="m-bKash" onclick="selectMethod('bKash')">bKash</div>
-                    <div class="method" id="m-Nagad" onclick="selectMethod('Nagad')">Nagad</div>
-                    <div class="method" id="m-Rocket" onclick="selectMethod('Rocket')">Rocket</div>
-                    <div class="method" id="m-Upay" onclick="selectMethod('Upay')">Upay</div>
-                </div>
-                <button class="btn-main" onclick="goToStep(3)">পরবর্তী ধাপ</button>
-            </div>
-
-            <div id="step-3" class="step" style="display:none;">
-                <div style="background: #fdf2f6; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 15px;">
-                    <p>নিচের <b id="sel-method-name">...</b> নম্বরে টাকা পাঠান:</p>
-                    <h2 id="payment-number" style="color: var(--primary); letter-spacing: 1px; margin: 10px 0;">লোড হচ্ছে...</h2>
-                    <p id="fee-info" style="font-size: 13px; color: var(--green); font-weight: bold;"></p>
-                </div>
-                <input type="text" id="trx-id" placeholder="Transaction ID (TrxID)">
-                <button class="btn-main" onclick="finalSubmit()">আবেদন সম্পন্ন করুন</button>
-            </div>
-            <button onclick="closeModal()" style="width:100%; background:none; border:none; margin-top:15px; color:#777;">বাতিল করুন</button>
-        </div>
-    </div>
-
-    <div id="withdraw-modal" class="modal">
-        <div class="modal-content">
-            <h3 style="color: var(--primary); text-align: center;">টাকা উত্তোলন</h3>
-            <input type="number" id="wd-amount" placeholder="পরিমাণ (৳)">
-            <select id="wd-method">
-                <option value="bKash">bKash</option>
-                <option value="Nagad">Nagad</option>
-                <option value="Rocket">Rocket</option>
-                <option value="Upay">Upay</option>
-            </select>
-            <input type="number" id="wd-number" placeholder="পেমেন্ট নম্বর">
-            <button class="btn-main" onclick="submitWithdraw()">উইথড্র রিকোয়েস্ট পাঠান</button>
-            <button onclick="closeModal()" style="width:100%; background:none; border:none; margin-top:15px; color:#777;">বাতিল করুন</button>
-        </div>
-    </div>
-
-    <div id="info-modal" class="modal">
-        <div class="modal-content" style="height: 70vh; overflow-y: auto;">
-            <h3 id="info-title" style="color: var(--primary);">লেনদেন ইতিহাস</h3>
-            <div id="info-body"></div>
-            <button class="btn-main" onclick="document.getElementById('info-modal').style.display='none'" style="margin-top:20px;">বন্ধ করুন</button>
-        </div>
-    </div>
-
-    <div class="bottom-nav" id="b-nav" style="display: none;">
-        <div class="nav-link active-nav" onclick="location.reload()"><i class="fas fa-home" style="font-size: 18px;"></i><br>হোম</div>
-        <div class="nav-link" onclick="openWithdraw()"><i class="fas fa-wallet" style="font-size: 18px;"></i><br>উইথড্র</div>
-        <div class="nav-link" onclick="showSupport()"><i class="fas fa-headset" style="font-size: 18px;"></i><br>সাপোর্ট</div>
-    </div>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCWNzlU0RLN05onwepfpNTadL7dxPl467Q",
-            authDomain: "my-cat-70db8.firebaseapp.com",
-            databaseURL: "https://my-cat-70db8-default-rtdb.firebaseio.com",
-            projectId: "my-cat-70db8",
-            storageBucket: "my-cat-70db8.firebasestorage.app",
-            messagingSenderId: "1019144594855",
-            appId: "1:1019144594855:web:81942b086bb56d32c20282"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        let currentUserPhone = localStorage.getItem("userPhone");
-        let adminSettings = {};
-        let currentService = "";
-        let selectedPayMethod = "";
-        let userBalance = 0;
-        let calcVal = 0;
-
-        db.ref('settings').on('value', s => { adminSettings = s.val() || {}; });
-
-        function toggleAuth() {
-            const isReg = document.getElementById('reg-fields').style.display === 'block';
-            document.getElementById('reg-fields').style.display = isReg ? 'none' : 'block';
-            document.getElementById('auth-title').innerText = isReg ? 'লগইন করুন' : 'রেজিস্ট্রেশন করুন';
-        }
-
-        function handleAuth() {
-            const phone = document.getElementById('auth-phone').value;
-            const pin = document.getElementById('auth-pin').value;
-            if(phone.length < 11) return alert("সঠিক নম্বর দিন");
-            
-            db.ref('users/' + phone).once('value', s => {
-                if(s.exists()) {
-                    if(s.val().pin === pin) {
-                        localStorage.setItem("userPhone", phone);
-                        location.reload();
-                    } else alert("ভুল পিন!");
-                } else {
-                    const name = document.getElementById('reg-name').value;
-                    if(!name) return alert("নাম লিখুন");
-                    db.ref('users/' + phone).set({name, phone, pin, balance: 0, status: "Active"}).then(() => {
-                        localStorage.setItem("userPhone", phone);
-                        location.reload();
-                    });
-                }
-            });
-        }
-
-        if(currentUserPhone) {
-            document.getElementById('auth-section').style.display = "none";
-            document.getElementById('app-main').style.display = "block";
-            document.getElementById('b-nav').style.display = "flex";
-            
-            db.ref('users/' + currentUserPhone).on('value', s => {
-                const u = s.val();
-                if(!u) return;
-                userBalance = u.balance || 0;
-                document.getElementById('user-display-name').innerText = u.name;
-                document.getElementById('user-display-balance').innerText = "৳ " + userBalance.toLocaleString();
-                
-                if(u.message && !u.message.read) {
-                    document.getElementById('msg-alert').style.display = "block";
-                    document.getElementById('admin-msg').innerText = u.message.text;
-                }
-            });
-        }
-
-        function openService(type) {
-            closeModal();
-            currentService = type;
-            document.getElementById('modal-title').innerText = type.toUpperCase();
-            document.getElementById('srv-duration').style.display = (type === 'deposit' || type === 'installment') ? "none" : "block";
-            document.getElementById('loan-reason').style.display = (type === 'loan') ? "block" : "none";
-            const cont = document.getElementById('amount-container');
-
-            if(type === 'loan') {
-                document.getElementById('srv-label').innerText = "লোন পরিমাণ নির্বাচন করুন";
-                let opt = `<select id="srv-amount" onchange="updateCalculation()"><option value="">নির্বাচন করুন</option>`;
-                for(let i=5000; i<=100000; i+=5000) opt += `<option value="${i}">৳${i}</option>`;
-                cont.innerHTML = opt + `</select>`;
-            } else if(type === 'dps') {
-                document.getElementById('srv-label').innerText = "মাসিক কিস্তি নির্বাচন করুন";
-                let opt = `<select id="srv-amount" onchange="updateCalculation()"><option value="">নির্বাচন করুন</option>`;
-                for(let i=500; i<=5000; i+=500) opt += `<option value="${i}">৳${i}</option>`;
-                cont.innerHTML = opt + `</select>`;
-            } else {
-                document.getElementById('srv-label').innerText = "টাকার পরিমাণ লিখুন";
-                cont.innerHTML = `<input type="number" id="srv-amount" placeholder="৳ ০.০০" oninput="updateCalculation()">`;
-            }
-            
-            document.getElementById('service-modal').style.display = "block";
-            goToStep(1);
-        }
-
-        function updateCalculation() {
-            const amt = parseFloat(document.getElementById('srv-amount').value);
-            const mon = parseInt(document.getElementById('srv-duration').value);
-            const res = document.getElementById('calc-result');
-            if(!amt) return res.style.display="none";
-            res.style.display = "block";
-
-            if(currentService === 'loan') {
-                let rate = (adminSettings.rates?.loanInterest || 10) / 100;
-                let total = amt + (amt * rate);
-                calcVal = (total / mon).toFixed(2);
-                res.innerHTML = `মোট পরিশোধ: ৳${total} <br> মাসিক কিস্তি: ৳${calcVal}`;
-            } else if(currentService === 'dps') {
-                let rate = (adminSettings.rates?.dpsProfit || 12) / 100;
-                calcVal = amt;
-                res.innerHTML = `মেয়াদ শেষে পাবেন: ৳${(amt * mon * (1 + rate)).toFixed(0)}`;
-            } else {
-                calcVal = amt;
-                res.style.display = "none";
-            }
-        }
-
-        function goToStep(n) {
-            if(n === 2 && !document.getElementById('srv-amount').value) return alert("পরিমাণ দিন");
-            document.querySelectorAll('.step').forEach(s => s.style.display = "none");
-            document.getElementById('step-' + n).style.display = "block";
-            if(n === 3) document.getElementById('fee-info').innerText = "পরিশোধ করুন: ৳" + calcVal;
-        }
-
-        function selectMethod(m) {
-            selectedPayMethod = m;
-            document.querySelectorAll('.method').forEach(el => el.classList.remove('selected'));
-            document.getElementById('m-'+m).classList.add('selected');
-            document.getElementById('sel-method-name').innerText = m;
-            document.getElementById('payment-number').innerText = adminSettings.numbers?.[m] || "No Number Set";
-        }
-
-        function finalSubmit() {
-            const trx = document.getElementById('trx-id').value;
-            if(!trx || !selectedPayMethod) return alert("সব তথ্য দিন");
-            db.ref('allRequests').push({
-                phone: currentUserPhone, amount: document.getElementById('srv-amount').value,
-                type: currentService, method: selectedPayMethod, trx: trx,
-                status: "Pending", time: Date.now()
-            }).then(() => { alert("আবেদন জমা হয়েছে!"); closeModal(); });
-        }
-
-        function openWithdraw() { closeModal(); document.getElementById('withdraw-modal').style.display = "block"; }
+        <input class="range-input" type="range" id="loan-amount" min="10000" max="100000" step="1000" value="10000" oninput="updateLoanAmount()">
         
-        function submitWithdraw() {
-            const amt = parseFloat(document.getElementById('wd-amount').value);
-            const num = document.getElementById('wd-number').value;
-            const min = adminSettings.rates?.minWithdraw || 100;
-            if(amt < min) return alert("সর্বনিম্ন উইথড্র ৳"+min);
-            if(amt > userBalance) return alert("পর্যাপ্ত ব্যালেন্স নেই");
-            
-            db.ref('users/'+currentUserPhone).update({balance: userBalance - amt}).then(() => {
-                db.ref('allRequests').push({
-                    phone: currentUserPhone, amount: amt, type: 'withdraw',
-                    method: document.getElementById('wd-method').value, sender: num,
-                    status: "Pending", time: Date.now()
-                }).then(() => { alert("সফল হয়েছে!"); closeModal(); });
-            });
-        }
+        <label class="form-label">পরিশোধের মেয়াদ</label>
+        <div class="range-display">
+          <span class="range-label">মাস:</span>
+          <span class="range-value" id="loan-duration-display">১২</span>
+        </div>
+        <input class="range-input" type="range" id="loan-duration" min="3" max="36" step="3" value="12" oninput="updateLoanDuration()">
+        
+        <div id="loan-calc-box" class="calc-result-box" style="display:none">
+          <div class="cr-main" id="loan-calc-main"></div>
+          <div class="cr-sub" id="loan-calc-sub"></div>
+        </div>
+        <div style="background:#f8fafd; border-radius:12px; padding:12px; margin-bottom:14px; border:1px solid #eee;">
+          <p style="font-size:12px; font-weight:700; color:var(--text2); margin-bottom:8px;">লোনের শর্তাবলী</p>
+          <ul style="font-size:12px; color:var(--text2); padding-left:16px; line-height:1.8">
+            <li>লোন অনুমোদন সাপেক্ষে ব্যালেন্সে যোগ হবে</li>
+            <li>প্রতি মাসের ১০ তারিখের মধ্যে কিস্তি পরিশোধ করতে হবে</li>
+            <li>সুদের হার: <span id="loan-rate-text">লোড হচ্ছে...</span></li>
+          </ul>
+        </div>
+        <button class="btn-primary" onclick="goLoanStep(2)">পরবর্তী ধাপ <i class="fas fa-arrow-right" style="margin-left:6px"></i></button>
+      </div>
+      <!-- Step 2 -->
+      <div class="step-content" id="loan-step-2">
+        <p style="font-size:13px; font-weight:700; color:var(--text); margin-bottom:12px;">পেমেন্ট মেথড বেছে নিন</p>
+        <div class="pay-methods">
+          <div class="pay-method" onclick="selectPayMethod('bKash', this, 'loan')">
+            <div class="pm-icon" style="background:linear-gradient(135deg,#e2136e,#c00)"><i class="fas fa-mobile-alt"></i></div>
+            <div class="pm-name">bKash</div>
+          </div>
+          <div class="pay-method" onclick="selectPayMethod('Nagad', this, 'loan')">
+            <div class="pm-icon" style="background:linear-gradient(135deg,#f4700f,#d45500)"><i class="fas fa-money-bill-wave"></i></div>
+            <div class="pm-name">Nagad</div>
+          </div>
+          <div class="pay-method" onclick="selectPayMethod('Rocket', this, 'loan')">
+            <div class="pm-icon" style="background:linear-gradient(135deg,#8123a0,#5c1870)"><i class="fas fa-rocket"></i></div>
+            <div class="pm-name">Rocket</div>
+          </div>
+          <div class="pay-method" onclick="selectPayMethod('Upay', this, 'loan')">
+            <div class="pm-icon" style="background:linear-gradient(135deg,#00a86b,#007a4f)"><i class="fas fa-fingerprint"></i></div>
+            <div class="pm-name">Upay</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:10px">
+          <button class="btn-secondary" style="flex:1" onclick="goLoanStep(1)"><i class="fas fa-arrow-left" style="margin-right:6px"></i>আগের ধাপ</button>
+          <button class="btn-primary" style="flex:2" onclick="goLoanStep(3)">পরবর্তী ধাপ <i class="fas fa-arrow-right" style="margin-left:6px"></i></button>
+        </div>
+      </div>
+      <!-- Step 3 -->
+      <div class="step-content" id="loan-step-3">
+        <div class="pay-info-box">
+          <div class="pib-method" id="loan-pay-method-name">নির্বাচিত: ---</div>
+          <div style="font-size:12px; color:var(--text2); margin:4px 0;">নিচের নম্বরে পাঠান (প্রথম কিস্তি বা নিশ্চিতকরণ ফি)</div>
+          <div class="pib-num" id="loan-pay-num">লোড হচ্ছে...</div>
+          <div class="pib-amt" id="loan-pay-amt">৳ 0</div>
+        </div>
+        <label class="form-label">যেই নম্বর থেকে পাঠিয়েছেন</label>
+        <input class="form-input" type="number" id="loan-sender" placeholder="01XXXXXXXXX">
+        <label class="form-label">Transaction ID (TrxID)</label>
+        <input class="form-input" type="text" id="loan-trx" placeholder="উদাহরণ: 8TH3X9L2K7">
+        <div style="display:flex; gap:10px">
+          <button class="btn-secondary" style="flex:1" onclick="goLoanStep(2)"><i class="fas fa-arrow-left" style="margin-right:6px"></i>আগের</button>
+          <button class="btn-primary" style="flex:2" onclick="submitLoan()"><i class="fas fa-check" style="margin-right:6px"></i>আবেদন করুন</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-        function showHistory() {
-            db.ref('allRequests').orderByChild('phone').equalTo(currentUserPhone).once('value', s => {
-                let h = "";
-                s.forEach(c => {
-                    const d = c.val();
-                    h += `<div style="padding:15px; border-bottom:1px solid #eee;">
-                        <b>${d.type.toUpperCase()}</b> <span style="float:right">৳${d.amount}</span><br>
-                        <small>${new Date(d.time).toLocaleDateString()} - ${d.status}</small>
-                    </div>`;
-                });
-                document.getElementById('info-body').innerHTML = h || "কোন তথ্য নেই";
-                document.getElementById('info-modal').style.display = "block";
-            });
-        }
+<!-- DPS MODAL -->
+<div class="modal-overlay" id="modal-dps">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="mh-icon" style="background: linear-gradient(135deg, #27ae60, #1e8a4a)"><i class="fas fa-piggy-bank"></i></div>
+      <div><div class="mh-title">ডিপিএস আবেদন</div><div class="mh-sub">মাসিক সঞ্চয় স্কিম</div></div>
+      <div class="modal-close" onclick="closeModal('modal-dps')"><i class="fas fa-times"></i></div>
+    </div>
+    <div class="modal-body">
+      <div class="step-indicator">
+        <div class="step-dot active" id="dps-sd-1">१</div>
+        <div class="step-line" id="dps-sl-1"></div>
+        <div class="step-dot" id="dps-sd-2">२</div>
+        <div class="step-line" id="dps-sl-2"></div>
+        <div class="step-dot" id="dps-sd-3">३</div>
+      </div>
+      <div class="step-content active" id="dps-step-1">
+        <label class="form-label">মাসিক কিস্তির পরিমাণ (৳)</label>
+        <div class="range-display">
+          <span class="range-label">টাকা:</span>
+          <span class="range-value" id="dps-amount-display">১০,০০০</span>
+        </div>
+        <input class="range-input" type="range" id="dps-amount" min="100" max="50000" step="500" value="10000" oninput="updateDpsAmount()">
+        
+        <label class="form-label">মেয়াদ</label>
+        <div class="range-display">
+          <span class="range-label">বছর:</span>
+          <span class="range-value" id="dps-duration-display">१ বছর (१२ মাস)</span>
+        </div>
+        <input class="range-input" type="range" id="dps-duration" min="12" max="120" step="12" value="12" oninput="updateDpsDuration()">
+        
+        <div id="dps-calc-box" class="calc-result-box" style="display:none">
+          <div class="cr-main" id="dps-calc-main"></div>
+          <div class="cr-sub" id="dps-calc-sub"></div>
+        </div>
+        <button class="btn-primary" onclick="goDpsStep(2)">পরবর্তী ধাপ <i class="fas fa-arrow-right" style="margin-left:6px"></i></button>
+      </div>
+      <div class="step-content" id="dps-step-2">
+        <p style="font-size:13px; font-weight:700; color:var(--text); margin-bottom:12px;">পেমেন্ট মেথড বেছে নিন</p>
+        <div class="pay-methods">
+          <div class="pay-method" onclick="selectPayMethod('bKash', this, 'dps')"><div class="pm-icon" style="background:linear-gradient(135deg,#e2136e,#c00)"><i class="fas fa-mobile-alt"></i></div><div class="pm-name">bKash</div></div>
+          <div class="pay-method" onclick="selectPayMethod('Nagad', this, 'dps')"><div class="pm-icon" style="background:linear-gradient(135deg,#f4700f,#d45500)"><i class="fas fa-money-bill-wave"></i></div><div class="pm-name">Nagad</div></div>
+          <div class="pay-method" onclick="selectPayMethod('Rocket', this, 'dps')"><div class="pm-icon" style="background:linear-gradient(135deg,#8123a0,#5c1870)"><i class="fas fa-rocket"></i></div><div class="pm-name">Rocket</div></div>
+          <div class="pay-method" onclick="selectPayMethod('Upay', this, 'dps')"><div class="pm-icon" style="background:linear-gradient(135deg,#00a86b,#007a4f)"><i class="fas fa-fingerprint"></i></div><div class="pm-name">Upay</div></div>
+        </div>
+        <div style="display:flex; gap:10px">
+          <button class="btn-secondary" style="flex:1" onclick="goDpsStep(1)"><i class="fas fa-arrow-left"></i> আগের</button>
+          <button class="btn-primary" style="flex:2" onclick="goDpsStep(3)">পরবর্তী <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+      <div class="step-content" id="dps-step-3">
+        <div class="pay-info-box">
+          <div class="pib-method" id="dps-pay-method-name">নির্বাচিত: ---</div>
+          <div style="font-size:12px; color:var(--text2); margin:4px 0">প্রথম কিস্তি পাঠান</div>
+          <div class="pib-num" id="dps-pay-num">লোড হচ্ছে...</div>
+          <div class="pib-amt" id="dps-pay-amt">৳ 0</div>
+        </div>
+        <label class="form-label">যেই নম্বর থেকে পাঠিয়েছেন</label>
+        <input class="form-input" type="number" id="dps-sender" placeholder="01XXXXXXXXX">
+        <label class="form-label">Transaction ID</label>
+        <input class="form-input" type="text" id="dps-trx" placeholder="TrxID লিখুন">
+        <div style="display:flex; gap:10px">
+          <button class="btn-secondary" style="flex:1" onclick="goDpsStep(2)"><i class="fas fa-arrow-left"></i> আগের</button>
+          <button class="btn-primary" style="flex:2" onclick="submitDps()"><i class="fas fa-check"></i> আবেদন করুন</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-        function showSupport() { window.open("https://wa.me/" + (adminSettings.support?.whatsapp || ""), "_blank"); }
-        function openDepositSelector() { document.getElementById('deposit-selector-modal').style.display = "block"; }
-        function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); }
-        function logout() { localStorage.clear(); location.reload(); }
-    </script>
+<!-- DEPOSIT MODAL -->
+<div class="modal-overlay" id="modal-deposit">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="mh-icon" style="background: linear-gradient(135deg, #e8a020, #c8870a)"><i class="fas fa-wallet"></i></div>
+      <div><div class="mh-title">টাকা জমা</div><div class="mh-sub">অ্যাকাউন্টে ব্যালেন্স যোগ করুন</div></div>
+      <div class="modal-close" onclick="closeModal('modal-deposit')"><i class="fas fa-times"></i></div>
+    </div>
+    <div class="modal-body">
+      <div class="step-indicator">
+        <div class="step-dot active" id="dep-sd-1">१</div>
+        <div class="step-line" id="dep-sl-1"></div>
+        <div class="step-dot" id="dep-sd-2">२</div>
+        <div class="step-line" id="dep-sl-2"></div>
+        <div class="step-dot" id="dep-sd-3">३</div>
+      </div>
+      <div class="step-content active" id="dep-step-1">
+        <label class="form-label">জমার পরিমাণ (৳)</label>
+        <input class="form-input" type="number" id="dep-amount" placeholder="পরিমাণ লিখুন">
+        <div style="background:#f0f5ff; border-radius:12px; padding:12px; margin-bottom:14px;">
+          <p style="font-size:12px; color:var(--primary); font-weight:700">💡 তথ্য:</p>
+          <p style="font-size:12px; color:var(--text2); margin-top:4px">ডিপোজিট অ্যাডমিন অনুমোদনের পর আপনার অ্যাকাউন্টে যুক্ত হবে।</p>
+        </div>
+        <button class="btn-primary" onclick="goDepStep(2)">পরবর্তী ধাপ <i class="fas fa-arrow-right"></i></button>
+      </div>
+      <div class="step-content" id="dep-step-2">
+        <p style="font-size:13px; font-weight:700; color:var(--text); margin-bottom:12px;">পেমেন্ট মেথড বেছে নিন</p>
+        <div class="pay-methods">
+          <div class="pay-method" onclick="selectPayMethod('bKash', this, 'deposit')"><div class="pm-icon" style="background:linear-gradient(135deg,#e2136e,#c00)"><i class="fas fa-mobile-alt"></i></div><div class="pm-name">bKash</div></div>
+          <div class="pay-method" onclick="selectPayMethod('Nagad', this, 'deposit')"><div class="pm-icon" style="background:linear-gradient(135deg,#f4700f,#d45500)"><i class="fas fa-money-bill-wave"></i></div><div class="pm-name">Nagad</div></div>
+          <div class="pay-method" onclick="selectPayMethod('Rocket', this, 'deposit')"><div class="pm-icon" style="background:linear-gradient(135deg,#8123a0,#5c1870)"><i class="fas fa-rocket"></i></div><div class="pm-name">Rocket</div></div>
+          <div class="pay-method" onclick="selectPayMethod('Upay', this, 'deposit')"><div class="pm-icon" style="background:linear-gradient(135deg,#00a86b,#007a4f)"><i class="fas fa-fingerprint"></i></div><div class="pm-name">Upay</div></div>
+        </div>
+        <div style="display:flex; gap:10px">
+          <button class="btn-secondary" style="flex:1" onclick="goDepStep(1)"><i class="fas fa-arrow-left"></i> আগের</button>
+          <button class="btn-primary" style="flex:2" onclick="goDepStep(3)">পরবর্তী <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+      <div class="step-content" id="dep-step-3">
+        <div class="pay-info-box">
+          <div class="pib-method" id="dep-pay-method-name">নির্বাচিত: ---</div>
+          <div style="font-size:12px; color:var(--text2); margin:4px 0">নিচের নম্বরে পাঠান</div>
+          <div class="pib-num" id="dep-pay-num">লোড হচ্ছে...</div>
+          <div class="pib-amt" id="dep-pay-amt">৳ 0</div>
+        </div>
+        <label class="form-label">যেই নম্বর থেকে পাঠিয়েছেন</label>
+        <input class="form-input" type="number" id="dep-sender" placeholder="01XXXXXXXXX">
+        <label class="form-label">Transaction ID</label>
+        <input class="form-input" type="text" id="dep-trx" placeholder="TrxID লিখুন">
+        <div style="display:flex; gap:10px">
+          <button class="btn-secondary" style="flex:1" onclick="goDepStep(2)"><i class="fas fa-arrow-left"></i> আগের</button>
+          <button class="btn-primary" style="flex:2" onclick="submitDeposit()"><i class="fas fa-check"></i> জমা করুন</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REPAY MODAL -->
+<div class="modal-overlay" id="modal-repay">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="mh-icon" style="background: linear-gradient(135deg, #8e44ad, #6c3483)"><i class="fas fa-calendar-check"></i></div>
+      <div><div class="mh-title">কিস্তি পরিশোধ</div><div class="mh-sub">লোনের মাসিক কিস্তি</div></div>
+      <div class="modal-close" onclick="closeModal('modal-repay')"><i class="fas fa-times"></i></div>
+    </div>
+    <div class="modal-body">
+      <div id="repay-no-loan" style="display:none; text-align:center; padding:20px">
+        <i class="fas fa-info-circle" style="font-size:40px; color:#ddd; margin-bottom:12px"></i>
+        <p style="color:var(--text2); font-size:14px">আপনার বর্তমানে কোনো অনুমোদিত লোন নেই।</p>
+        <button class="btn-primary" style="margin-top:14px; width:auto; padding:12px 24px" onclick="closeModal('modal-repay'); openLoanModal()">লোনের আবেদন করুন</button>
+      </div>
+      <div id="repay-content">
+        <div class="repay-alert">
+          <div class="ra-title"><i class="fas fa-exclamation-triangle" style="margin-right:6px"></i>মাসিক কিস্তির বিবরণ</div>
+          <div class="ra-row"><span>মূল লোনের পরিমাণ:</span><span id="repay-principal">৳ ---</span></div>
+          <div class="ra-row"><span>মাসিক কিস্তি:</span><span id="repay-monthly">৳ ---</span></div>
+          <div class="ra-row"><span>পরিশোধের তারিখ:</span><span style="color:#e74c3c">প্রতি মাসের ১০ তারিখ</span></div>
+        </div>
+        <div class="step-indicator">
+          <div class="step-dot active" id="rep-sd-1">१</div>
+          <div class="step-line" id="rep-sl-1"></div>
+          <div class="step-dot" id="rep-sd-2">२</div>
+          <div class="step-line" id="rep-sl-2"></div>
+          <div class="step-dot" id="rep-sd-3">३</div>
+        </div>
+        <div class="step-content active" id="rep-step-1">
+          <label class="form-label">পরিশোধের পরিমাণ (৳)</label>
+          <input class="form-input" type="number" id="repay-amount" placeholder="কিস্তির পরিমাণ" readonly>
+          <button class="btn-primary" onclick="goRepStep(2)">পেমেন্ট করুন <i class="fas fa-arrow-right"></i></button>
+        </div>
+        <div class="step-content" id="rep-step-2">
+          <p style="font-size:13px; font-weight:700; color:var(--text); margin-bottom:12px;">পেমেন্ট মেথড বেছে নিন</p>
+          <div class="pay-methods">
+            <div class="pay-method" onclick="selectPayMethod('bKash', this, 'installment')"><div class="pm-icon" style="background:linear-gradient(135deg,#e2136e,#c00)"><i class="fas fa-mobile-alt"></i></div><div class="pm-name">bKash</div></div>
+            <div class="pay-method" onclick="selectPayMethod('Nagad', this, 'installment')"><div class="pm-icon" style="background:linear-gradient(135deg,#f4700f,#d45500)"><i class="fas fa-money-bill-wave"></i></div><div class="pm-name">Nagad</div></div>
+            <div class="pay-method" onclick="selectPayMethod('Rocket', this, 'installment')"><div class="pm-icon" style="background:linear-gradient(135deg,#8123a0,#5c1870)"><i class="fas fa-rocket"></i></div><div class="pm-name">Rocket</div></div>
+            <div class="pay-method" onclick="selectPayMethod('Upay', this, 'installment')"><div class="pm-icon" style="background:linear-gradient(135deg,#00a86b,#007a4f)"><i class="fas fa-fingerprint"></i></div><div class="pm-name">Upay</div></div>
+          </div>
+          <div style="display:flex; gap:10px">
+            <button class="btn-secondary" style="flex:1" onclick="goRepStep(1)"><i class="fas fa-arrow-left"></i> আগের</button>
+            <button class="btn-primary" style="flex:2" onclick="goRepStep(3)">পরবর্তী <i class="fas fa-arrow-right"></i></button>
+          </div>
+        </div>
+        <div class="step-content" id="rep-step-3">
+          <div class="pay-info-box">
+            <div class="pib-method" id="rep-pay-method-name">নির্বাচিত: ---</div>
+            <div style="font-size:12px; color:var(--text2); margin:4px 0">নিচের নম্বরে পাঠান</div>
+            <div class="pib-num" id="rep-pay-num">লোড হচ্ছে...</div>
+            <div class="pib-amt" id="rep-pay-amt">৳ 0</div>
+          </div>
+          <label class="form-label">যেই নম্বর থেকে পাঠিয়েছেন</label>
+          <input class="form-input" type="number" id="rep-sender" placeholder="01XXXXXXXXX">
+          <label class="form-label">Transaction ID</label>
+          <input class="form-input" type="text" id="rep-trx" placeholder="TrxID লিখুন">
+          <div style="display:flex; gap:10px">
+            <button class="btn-secondary" style="flex:1" onclick="goRepStep(2)"><i class="fas fa-arrow-left"></i> আগের</button>
+            <button class="btn-primary" style="flex:2" onclick="submitRepay()"><i class="fas fa-check"></i> পরিশোধ করুন</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WITHDRAW MODAL -->
+<div class="modal-overlay" id="modal-withdraw">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="mh-icon" style="background: linear-gradient(135deg, #16a085, #0e7a65)"><i class="fas fa-money-bill-wave"></i></div>
+      <div><div class="mh-title">টাকা উত্তোলন</div><div class="mh-sub">Withdraw Request</div></div>
+      <div class="modal-close" onclick="closeModal('modal-withdraw')"><i class="fas fa-times"></i></div>
+    </div>
+    <div class="modal-body">
+      <div class="wd-balance-info">
+        <div class="wbi-label">উত্তোলনযোগ্য ব্যালেন্স</div>
+        <div class="wbi-val" id="wd-available-bal">৳ 0.00</div>
+      </div>
+      <label class="form-label">উত্তোলনের পরিমাণ (৳)</label>
+      <input class="form-input" type="number" id="wd-amount" placeholder="পরিমাণ লিখুন (সর্বনিম্ন ১০০)">
+      <label class="form-label">পেমেন্ট মেথড</label>
+      <select class="form-select" id="wd-method">
+        <option value="bKash">bKash</option>
+        <option value="Nagad">Nagad</option>
+        <option value="Rocket">Rocket</option>
+        <option value="Upay">Upay</option>
+      </select>
+      <label class="form-label">যেই নম্বরে পাঠাবেন</label>
+      <input class="form-input" type="number" id="wd-number" placeholder="01XXXXXXXXX">
+      <div style="background:#fff3e0; border-radius:12px; padding:12px; margin-bottom:14px; border:1px solid #ffc107;">
+        <p style="font-size:12px; color:#e65100; font-weight:600"><i class="fas fa-exclamation-circle" style="margin-right:6px"></i>উইথড্র রিকোয়েস্ট দিলে ব্যালেন্স তাৎক্ষণিকভাবে কেটে নেওয়া হবে।</p>
+      </div>
+      <button class="btn-primary" onclick="submitWithdraw()"><i class="fas fa-paper-plane" style="margin-right:8px"></i>উইথড্র রিকোয়েস্ট পাঠান</button>
+      <button class="btn-secondary" onclick="closeModal('modal-withdraw')">বাতিল করুন</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCWNzlU0RLN05onwepfpNTadL7dxPl467Q",
+  authDomain: "my-cat-70db8.firebaseapp.com",
+  databaseURL: "https://my-cat-70db8-default-rtdb.firebaseio.com",
+  projectId: "my-cat-70db8",
+  storageBucket: "my-cat-70db8.firebasestorage.app",
+  messagingSenderId: "1019144594855",
+  appId: "1:1019144594855:web:81942b086bb56d32c20282"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let isLogin = true;
+let currentPhone = localStorage.getItem('ffwPhone');
+let adminSettings = { numbers: {}, support: {}, rates: { loanInterest: 10, dpsProfit: 12 } };
+let userBalance = 0;
+let selectedMethods = { loan: '', dps: '', deposit: '', installment: '' };
+let allRequests = [];
+let activeLoan = null;
+
+// Load settings
+db.ref('settings').on('value', s => {
+  if (s.val()) {
+    adminSettings = s.val();
+    if (document.getElementById('loan-rate-text'))
+      document.getElementById('loan-rate-text').innerText = (adminSettings.rates?.loanInterest || 10) + '% বার্ষিক';
+  }
+});
+
+// ---- AUTH ----
+function toggleAuth() {
+  isLogin = !isLogin;
+  document.getElementById('auth-title').innerText = isLogin ? 'স্বাগতম!' : 'নতুন অ্যাকাউন্ট';
+  document.getElementById('auth-sub').innerText = isLogin ? 'আপনার অ্যাকাউন্টে প্রবেশ করুন' : 'বিনামূল্যে রেজিস্ট্রেশন করুন';
+  document.getElementById('auth-btn-text').innerText = isLogin ? 'লগইন করুন' : 'রেজিস্ট্রেশন করুন';
+  document.getElementById('reg-field').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('toggle-text').innerText = isLogin ? 'নতুন অ্যাকাউন্ট? রেজিস্ট্রেশন করুন' : 'ইতিমধ্যে অ্যাকাউন্ট আছে? লগইন করুন';
+}
+toggleAuth(); toggleAuth(); // init
+
+function handleAuth() {
+  const phone = document.getElementById('auth-phone').value.trim();
+  const pin = document.getElementById('auth-pin').value.trim();
+  if (phone.length < 11 || pin.length !== 4) { showToast('সঠিক মোবাইল নম্বর ও ৪ সংখ্যার পিন দিন', 'error'); return; }
+  if (isLogin) {
+    db.ref('users/' + phone).once('value', s => {
+      if (s.exists() && s.val().pin === pin) {
+        localStorage.setItem('ffwPhone', phone);
+        location.reload();
+      } else showToast('ভুল নম্বর বা পিন!', 'error');
+    });
+  } else {
+    const name = document.getElementById('reg-name').value.trim();
+    if (!name) { showToast('নাম লিখুন', 'error'); return; }
+    db.ref('users/' + phone).once('value', s => {
+      if (s.exists()) { showToast('এই নম্বরে ইতিমধ্যে অ্যাকাউন্ট আছে', 'error'); return; }
+      db.ref('users/' + phone).set({ name, phone, pin, balance: 0, status: 'Active', joinDate: Date.now() }).then(() => {
+        showToast('রেজিস্ট্রেশন সফল! এখন লগইন করুন', 'success'); toggleAuth();
+      });
+    });
+  }
+}
+
+// ---- INIT APP ----
+if (currentPhone) {
+  document.getElementById('auth-wrap').style.display = 'none';
+  document.getElementById('app-main').style.display = 'block';
+  db.ref('users/' + currentPhone).on('value', s => {
+    const d = s.val();
+    if (!d) { logout(); return; }
+    userBalance = d.balance || 0;
+    document.getElementById('user-display-name').innerText = d.name;
+    document.getElementById('user-display-balance').innerText = '৳ ' + userBalance.toLocaleString('bn-BD');
+    document.getElementById('wd-available-bal').innerText = '৳ ' + userBalance.toLocaleString('bn-BD');
+    document.getElementById('prof-name').innerText = d.name;
+    document.getElementById('prof-phone').innerText = d.phone;
+    document.getElementById('prof-status').innerText = d.status || 'Active';
+    document.getElementById('bal-acc-id').innerText = 'FFW-' + currentPhone.slice(-4);
+    loadLoanStatus();
+    loadRecentTxn();
+  });
+}
+
+// ---- LOAN STATUS ----
+function loadLoanStatus() {
+  db.ref('allRequests').orderByChild('phone').equalTo(currentPhone).on('value', s => {
+    activeLoan = null;
+    let loans = [];
+    s.forEach(c => { const d = c.val(); if (d.type === 'loan') loans.push({key: c.key, ...d}); });
+    loans.sort((a, b) => b.time - a.time);
+    const lastLoan = loans.find(l => l.status === 'Approved') || loans[0];
+    if (lastLoan) {
+      if (lastLoan.status === 'Approved') activeLoan = lastLoan;
+      const rate = (adminSettings.rates?.loanInterest || 10) / 100;
+      const total = parseFloat(lastLoan.amount) * (1 + rate);
+      const monthly = (total / parseInt(lastLoan.duration || 12)).toFixed(2);
+      const pct = lastLoan.status === 'Approved' ? 40 : 10;
+      document.getElementById('loan-status-section').innerHTML = `
+        <div class="loan-status-card" style="border-left-color: ${lastLoan.status === 'Approved' ? 'var(--accent2)' : lastLoan.status === 'Pending' ? 'var(--accent)' : '#e74c3c'}">
+          <div class="ls-top">
+            <div class="ls-title"><i class="fas fa-hand-holding-usd" style="margin-right:6px;color:var(--primary)"></i>সর্বশেষ লোন: ৳${parseFloat(lastLoan.amount).toLocaleString()}</div>
+            <div class="ls-badge ${lastLoan.status === 'Approved' ? 'ls-approved' : lastLoan.status === 'Pending' ? 'ls-pending' : 'ls-none'}">${lastLoan.status === 'Approved' ? 'অনুমোদিত' : lastLoan.status === 'Pending' ? 'অপেক্ষমাণ' : 'প্রত্যাখ্যাত'}</div>
+          </div>
+          <div class="ls-progress-bar"><div class="ls-progress-fill" style="width:${pct}%"></div></div>
+          <div class="ls-meta"><span>মাসিক কিস্তি: ৳${monthly}</span><span>${lastLoan.duration || 12} মাস</span></div>
+        </div>`;
+      document.getElementById('bal-loan-status').innerText = lastLoan.status === 'Approved' ? '৳' + parseFloat(lastLoan.amount).toLocaleString() : lastLoan.status === 'Pending' ? 'অপেক্ষমাণ' : 'কোনো লোন নেই';
+    } else {
+      document.getElementById('loan-status-section').innerHTML = `<div class="loan-status-card" style="border-left-color:#ddd; text-align:center; padding:18px"><i class="fas fa-info-circle" style="color:#ccc; font-size:24px; margin-bottom:8px"></i><p style="color:var(--text2); font-size:13px">কোনো সক্রিয় লোন নেই। আজই আবেদন করুন!</p><button onclick="openLoanModal()" style="margin-top:10px; padding:10px 20px; background:var(--primary); color:white; border:none; border-radius:10px; font-size:13px; cursor:pointer; font-family:inherit">লোনের আবেদন করুন</button></div>`;
+    }
+  });
+}
+
+// ---- RECENT TXN ----
+function loadRecentTxn() {
+  db.ref('allRequests').orderByChild('phone').equalTo(currentPhone).limitToLast(5).on('value', s => {
+    let items = []; s.forEach(c => items.push({key: c.key, ...c.val()}));
+    items.sort((a, b) => b.time - a.time);
+    const txnEl = document.getElementById('recent-txn');
+    if (!items.length) { txnEl.innerHTML = '<div class="empty-state"><i class="fas fa-exchange-alt"></i><p>কোনো লেনদেন নেই</p></div>'; return; }
+    txnEl.innerHTML = items.map(t => renderTxnItem(t)).join('');
+    allRequests = items;
+  });
+}
+
+function renderTxnItem(t) {
+  const icons = { loan: 'hand-holding-usd', dps: 'piggy-bank', deposit: 'wallet', withdraw: 'money-bill-wave', installment: 'calendar-check' };
+  const colors = { loan: '#2980b9', dps: '#27ae60', deposit: '#e8a020', withdraw: '#e74c3c', installment: '#8e44ad' };
+  const names = { loan: 'লোন আবেদন', dps: 'ডিপিএস', deposit: 'ডিপোজিট', withdraw: 'উইথড্র', installment: 'কিস্তি পরিশোধ' };
+  const isCredit = ['loan', 'deposit'].includes(t.type) && t.status === 'Approved';
+  return `<div class="txn-item">
+    <div class="txn-icon" style="background:${colors[t.type] || '#888'}"><i class="fas fa-${icons[t.type] || 'exchange-alt'}"></i></div>
+    <div class="txn-info">
+      <div class="ti-name">${names[t.type] || t.type}</div>
+      <div class="ti-date">${new Date(t.time).toLocaleDateString('bn-BD')} • ${t.status === 'Approved' ? '<span style="color:#27ae60">অনুমোদিত</span>' : t.status === 'Pending' ? '<span style="color:#e8a020">অপেক্ষমাণ</span>' : '<span style="color:#e74c3c">প্রত্যাখ্যাত</span>'}</div>
+    </div>
+    <div class="txn-amount ${isCredit ? 'credit' : 'debit'}">${isCredit ? '+' : '-'}৳${parseFloat(t.amount).toLocaleString()}</div>
+  </div>`;
+}
+
+// ---- RANGE SLIDERS ----
+function updateLoanAmount() {
+  const val = document.getElementById('loan-amount').value;
+  document.getElementById('loan-amount-display').innerText = parseInt(val).toLocaleString('bn-BD');
+  calcLoan();
+}
+
+function updateLoanDuration() {
+  const val = document.getElementById('loan-duration').value;
+  document.getElementById('loan-duration-display').innerText = val;
+  calcLoan();
+}
+
+function updateDpsAmount() {
+  const val = document.getElementById('dps-amount').value;
+  document.getElementById('dps-amount-display').innerText = parseInt(val).toLocaleString('bn-BD');
+  calcDps();
+}
+
+function updateDpsDuration() {
+  const val = parseInt(document.getElementById('dps-duration').value);
+  const years = Math.floor(val / 12);
+  const months = val % 12;
+  let display = '';
+  if (years > 0) display += years + ' বছর ';
+  if (months > 0) display += months + ' মাস';
+  if (!display) display = val + ' মাস';
+  document.getElementById('dps-duration-display').innerText = display + ' (' + val + ' মাস)';
+  calcDps();
+}
+
+// ---- CALC ----
+function calcLoan() {
+  const amt = parseFloat(document.getElementById('loan-amount').value);
+  const dur = parseInt(document.getElementById('loan-duration').value);
+  if (!amt || amt <= 0) { document.getElementById('loan-calc-box').style.display = 'none'; return; }
+  const rate = (adminSettings.rates?.loanInterest || 10) / 100;
+  const total = (amt * (1 + rate)).toFixed(2);
+  const monthly = (total / dur).toFixed(2);
+  document.getElementById('loan-calc-main').innerHTML = `মোট পরিশোধযোগ্য: ৳${parseFloat(total).toLocaleString('bn-BD')} | মাসিক কিস্তি: ৳${parseFloat(monthly).toLocaleString('bn-BD')}`;
+  document.getElementById('loan-calc-sub').innerText = `সুদ: ৳${(amt * rate).toFixed(2)} | মেয়াদ: ${dur} মাস`;
+  document.getElementById('loan-calc-box').style.display = 'block';
+}
+
+function calcDps() {
+  const amt = parseFloat(document.getElementById('dps-amount').value);
+  const dur = parseInt(document.getElementById('dps-duration').value);
+  if (!amt || amt <= 0) { document.getElementById('dps-calc-box').style.display = 'none'; return; }
+  const rate = (adminSettings.rates?.dpsProfit || 12) / 100;
+  const total = amt * dur;
+  const profit = (total * rate).toFixed(2);
+  const maturity = (parseFloat(total) + parseFloat(profit)).toFixed(2);
+  document.getElementById('dps-calc-main').innerHTML = `মেয়াদ শেষে পাবেন: ৳${parseFloat(maturity).toLocaleString('bn-BD')}`;
+  document.getElementById('dps-calc-sub').innerText = `মোট জমা: ৳${parseInt(total).toLocaleString('bn-BD')} | মুনাফা: ৳${parseFloat(profit).toLocaleString('bn-BD')}`;
+  document.getElementById('dps-calc-box').style.display = 'block';
+}
+
+// ---- FILTER HISTORY ----
+function filterHistory(type, el) {
+  document.querySelectorAll('.hf-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  db.ref('allRequests').orderByChild('phone').equalTo(currentPhone).on('value', s => {
+    let items = []; s.forEach(c => items.push({key: c.key, ...c.val()}));
+    items.sort((a, b) => b.time - a.time);
+    if (type !== 'all') items = items.filter(i => i.type === type);
+    const el2 = document.getElementById('full-history');
+    if (!items.length) { el2.innerHTML = '<div class="empty-state"><i class="fas fa-exchange-alt"></i><p>কোনো লেনদেন নেই</p></div>'; return; }
+    el2.innerHTML = items.map(t => renderTxnItem(t)).join('');
+  });
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'page-history') filterHistory('all', document.querySelector('.hf-chip'));
+}
+
+function setNav(id) {
+  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+// ---- STEP MANAGEMENT ----
+function goStep(prefix, n, max) {
+  for (let i = 1; i <= max; i++) {
+    const sc = document.getElementById(prefix + '-step-' + i);
+    if (sc) { sc.classList.remove('active'); if (i === n) sc.classList.add('active'); }
+    const sd = document.getElementById(prefix + '-sd-' + i);
+    if (sd) { sd.classList.remove('active', 'done'); if (i === n) sd.classList.add('active'); else if (i < n) sd.classList.add('done'); }
+    const sl = document.getElementById(prefix + '-sl-' + i);
+    if (sl) { sl.classList.remove('done'); if (i < n) sl.classList.add('done'); }
+  }
+}
+
+function goLoanStep(n) {
+  if (n === 2) {
+    if (!document.getElementById('loan-amount').value) { showToast('লোনের পরিমাণ লিখুন', 'error'); return; }
+  }
+  if (n === 3) {
+    if (!selectedMethods.loan) { showToast('পেমেন্ট মেথড বেছে নিন', 'error'); return; }
+    const amt = parseFloat(document.getElementById('loan-amount').value);
+    const dur = parseInt(document.getElementById('loan-duration').value);
+    const rate = (adminSettings.rates?.loanInterest || 10) / 100;
+    const monthly = ((amt * (1 + rate)) / dur).toFixed(2);
+    document.getElementById('loan-pay-method-name').innerText = 'নির্বাচিত: ' + selectedMethods.loan;
+    document.getElementById('loan-pay-num').innerText = adminSettings.numbers?.[selectedMethods.loan] || 'সেট করা নেই';
+    document.getElementById('loan-pay-amt').innerText = 'প্রথম কিস্তি: ৳' + parseFloat(monthly).toLocaleString('bn-BD');
+  }
+  goStep('loan', n, 3);
+}
+
+function goDpsStep(n) {
+  if (n === 2 && !document.getElementById('dps-amount').value) { showToast('পরিমাণ লিখুন', 'error'); return; }
+  if (n === 3) {
+    if (!selectedMethods.dps) { showToast('পেমেন্ট মেথড বেছে নিন', 'error'); return; }
+    document.getElementById('dps-pay-method-name').innerText = 'নির্বাচিত: ' + selectedMethods.dps;
+    document.getElementById('dps-pay-num').innerText = adminSettings.numbers?.[selectedMethods.dps] || 'সেট করা নেই';
+    document.getElementById('dps-pay-amt').innerText = 'প্রথম কিস্তি: ৳' + parseInt(document.getElementById('dps-amount').value).toLocaleString('bn-BD');
+  }
+  goStep('dps', n, 3);
+}
+
+function goDepStep(n) {
+  if (n === 2 && !document.getElementById('dep-amount').value) { showToast('পরিমাণ লিখুন', 'error'); return; }
+  if (n === 3) {
+    if (!selectedMethods.deposit) { showToast('পেমেন্ট মেথড বেছে নিন', 'error'); return; }
+    document.getElementById('dep-pay-method-name').innerText = 'নির্বাচিত: ' + selectedMethods.deposit;
+    document.getElementById('dep-pay-num').innerText = adminSettings.numbers?.[selectedMethods.deposit] || 'সেট করা নেই';
+    document.getElementById('dep-pay-amt').innerText = '৳' + parseInt(document.getElementById('dep-amount').value).toLocaleString('bn-BD');
+  }
+  goStep('dep', n, 3);
+}
+
+function goRepStep(n) {
+  if (n === 3) {
+    if (!selectedMethods.installment) { showToast('পেমেন্ট মেথড বেছে নিন', 'error'); return; }
+    document.getElementById('rep-pay-method-name').innerText = 'নির্বাচিত: ' + selectedMethods.installment;
+    document.getElementById('rep-pay-num').innerText = adminSettings.numbers?.[selectedMethods.installment] || 'সেট করা নেই';
+    document.getElementById('rep-pay-amt').innerText = document.getElementById('repay-amount').value ? '৳' + parseFloat(document.getElementById('repay-amount').value).toLocaleString('bn-BD') : '---';
+  }
+  goStep('rep', n, 3);
+}
+
+function selectPayMethod(method, el, type) {
+  selectedMethods[type] = method;
+  const container = el.closest('.pay-methods');
+  container.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ---- SUBMIT ----
+function submitLoan() {
+  const amt = document.getElementById('loan-amount').value;
+  const dur = document.getElementById('loan-duration').value;
+  const sender = document.getElementById('loan-sender').value;
+  const trx = document.getElementById('loan-trx').value;
+  if (!sender || !trx) { showToast('সকল তথ্য পূরণ করুন', 'error'); return; }
+  db.ref('allRequests').push({ phone: currentPhone, amount: amt, duration: dur, method: selectedMethods.loan, sender, trx, type: 'loan', status: 'Pending', time: Date.now() }).then(() => {
+    showToast('লোন আবেদন সফলভাবে পাঠানো হয়েছে!', 'success'); closeModal('modal-loan'); resetSteps('loan');
+  });
+}
+
+function submitDps() {
+  const amt = document.getElementById('dps-amount').value;
+  const dur = document.getElementById('dps-duration').value;
+  const sender = document.getElementById('dps-sender').value;
+  const trx = document.getElementById('dps-trx').value;
+  if (!sender || !trx) { showToast('সকল তথ্য পূরণ করুন', 'error'); return; }
+  db.ref('allRequests').push({ phone: currentPhone, amount: amt, duration: dur, method: selectedMethods.dps, sender, trx, type: 'dps', status: 'Pending', time: Date.now() }).then(() => {
+    showToast('ডিপিএস আবেদন সফলভাবে পাঠানো হয়েছে!', 'success'); closeModal('modal-dps'); resetSteps('dps');
+  });
+}
+
+function submitDeposit() {
+  const amt = document.getElementById('dep-amount').value;
+  const sender = document.getElementById('dep-sender').value;
+  const trx = document.getElementById('dep-trx').value;
+  if (!sender || !trx) { showToast('সকল তথ্য পূরণ করুন', 'error'); return; }
+  db.ref('allRequests').push({ phone: currentPhone, amount: amt, method: selectedMethods.deposit, sender, trx, type: 'deposit', status: 'Pending', time: Date.now() }).then(() => {
+    showToast('ডিপোজিট আবেদন সফলভাবে পাঠানো হয়েছে!', 'success'); closeModal('modal-deposit'); resetSteps('dep');
+  });
+}
+
+function submitRepay() {
+  const amt = document.getElementById('repay-amount').value;
+  const sender = document.getElementById('rep-sender').value;
+  const trx = document.getElementById('rep-trx').value;
+  if (!sender || !trx) { showToast('সকল তথ্য পূরণ করুন', 'error'); return; }
+  db.ref('allRequests').push({ phone: currentPhone, amount: amt, method: selectedMethods.installment, sender, trx, type: 'installment', status: 'Pending', time: Date.now() }).then(() => {
+    showToast('কিস্তি পরিশোধের আবেদন পাঠানো হয়েছে!', 'success'); closeModal('modal-repay'); resetSteps('rep');
+  });
+}
+
+function submitWithdraw() {
+  const amt = parseFloat(document.getElementById('wd-amount').value);
+  const num = document.getElementById('wd-number').value;
+  const met = document.getElementById('wd-method').value;
+  if (!amt || amt < 100 || !num) { showToast('সর্বনিম্ন ১০০ টাকা এবং সঠিক নম্বর দিন', 'error'); return; }
+  if (amt > userBalance) { showToast('আপনার ব্যালেন্স পর্যাপ্ত নয়!', 'error'); return; }
+  if (!confirm(`৳${amt} উত্তোলন নিশ্চিত করবেন?`)) return;
+  db.ref('users/' + currentPhone).update({ balance: userBalance - amt }).then(() => {
+    db.ref('allRequests').push({ phone: currentPhone, amount: amt, method: met, sender: num, trx: 'WITHDRAW', type: 'withdraw', status: 'Pending', time: Date.now() }).then(() => {
+      showToast('উইথড্র রিকোয়েস্ট পাঠানো হয়েছে!', 'success'); closeModal('modal-withdraw');
+    });
+  });
+}
+
+// ---- MODAL OPENERS ----
+function openLoanModal() { openModal('modal-loan'); resetSteps('loan'); }
+function openDpsModal() { openModal('modal-dps'); resetSteps('dps'); }
+function openDepositModal() { openModal('modal-deposit'); resetSteps('dep'); }
+function openWithdrawModal() { openModal('modal-withdraw'); }
+function openRepayModal() {
+  openModal('modal-repay'); resetSteps('rep');
+  db.ref('allRequests').orderByChild('phone').equalTo(currentPhone).on('value', s => {
+    let lastLoan = null;
+    s.forEach(c => { const d = c.val(); if (d.type === 'loan' && d.status === 'Approved') lastLoan = d; });
+    if (lastLoan) {
+      const rate = (adminSettings.rates?.loanInterest || 10) / 100;
+      const total = parseFloat(lastLoan.amount) * (1 + rate);
+      const monthly = (total / parseInt(lastLoan.duration || 12)).toFixed(2);
+      document.getElementById('repay-principal').innerText = '৳ ' + parseFloat(lastLoan.amount).toLocaleString('bn-BD');
+      document.getElementById('repay-monthly').innerText = '৳ ' + parseFloat(monthly).toLocaleString('bn-BD');
+      document.getElementById('repay-amount').value = monthly;
+      document.getElementById('repay-no-loan').style.display = 'none';
+      document.getElementById('repay-content').style.display = 'block';
+    } else {
+      document.getElementById('repay-no-loan').style.display = 'block';
+      document.getElementById('repay-content').style.display = 'none';
+    }
+  });
+}
+
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function resetSteps(prefix) {
+  goStep(prefix, 1, 3);
+  selectedMethods[prefix === 'dep' ? 'deposit' : prefix === 'rep' ? 'installment' : prefix] = '';
+  document.querySelectorAll(`#modal-${prefix === 'dep' ? 'deposit' : prefix === 'rep' ? 'repay' : prefix} .pay-method`).forEach(m => m.classList.remove('selected'));
+}
+
+// Close modal on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); });
+});
+
+function openWhatsApp() {
+  const wa = adminSettings.support?.whatsapp || '01700000000';
+  window.open('https://wa.me/880' + wa.replace(/^0/, ''), '_blank');
+}
+function openPhoneSupport() {
+  const wa = adminSettings.support?.whatsapp || '01700000000';
+  window.open('tel:' + wa);
+}
+function openFaq() { showToast('FAQ শীঘ্রই আসছে', 'info'); }
+
+function logout() { localStorage.clear(); location.reload(); }
+
+function showToast(msg, type = 'info') {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast ' + (type === 'success' ? 'success' : type === 'error' ? 'error' : '');
+  t.innerText = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+</script>
 </body>
 </html>
